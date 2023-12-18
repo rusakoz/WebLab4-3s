@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/studs
+    username: s338963
+    password:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties.hibernate:
+      show-sql: true
+      format-sql: true
+
+logging:
+  level:
+    root: INFO
