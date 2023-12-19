@@ -7,7 +7,8 @@
 </head>
 <body>
 <div id="app">
-    <button @click="increment">count is: {{ message }}</button>
+    <button>count is: {{ message.toLocaleTimeString() }}</button>
+    <button @click="increment">count is: {{ message2 }}</button>
 </div>
 <script type="module" src="js/main.js"></script>
 </body>
