@@ -1,8 +1,10 @@
+server:
+  port: 8887
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/studs
     username: s338963
-    password:
+    password: ${db-password}
     driver-class-name: org.postgresql.Driver
   jpa:
     properties.hibernate:

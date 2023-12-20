@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
-    <link rel="StyleSheet" href="assets/style.css" type="text/css" />
+    <link rel="StyleSheet" href="/assets/style.css" type="text/css" />
     <title>Четвертая лаба</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 
 <body>
@@ -12,8 +11,8 @@
         <div class="container">
             <div class="nav">
                 <p class="info">Группа: P3223 Вариант: ...</p>
-                <a href="/index.html" class="logo" id="logo-a">Кожемякин Руслан Алексеевич</a>
-                <a href="/index.html" class="home" id="home-a">
+                <a href="/templates/index.html" class="logo" id="logo-a">Кожемякин Руслан Алексеевич</a>
+                <a href="/templates/index.html" class="home" id="home-a">
                     <img src="/images/home.svg" alt="#" height="16" width="16"/>
                 </a>
             </div>
@@ -58,6 +57,6 @@
             </div>
         </div>
     </div>
-    <script type="module" src="js/main.js"></script>
+    <script th:src="${isDevMode} ? 'http://localhost:8081/main.js' : '/js/main.js' "></script>
 </body>
 </html>

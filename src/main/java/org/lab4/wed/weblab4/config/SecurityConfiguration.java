@@ -15,10 +15,10 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/assets/*", "/js/*", "/images/*").permitAll()
+                        .requestMatchers("/", "/assets/**", "/js/**", "/images/**", "/error**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(login -> login
-                        .loginPage("/index.html")
+                        .loginPage("/")
                         .defaultSuccessUrl("/loginsuccess")
                         .permitAll());
         return httpSecurity.build();
