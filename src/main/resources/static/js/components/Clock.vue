@@ -8,12 +8,10 @@ onBeforeMount(function (){
 </script>
 
 <template>
-<div>
     <button class="main-btn" id="main-btn" type="button">
         <span class="link-text">Fffffff</span>
         <span id="clock">{{ message }}</span>
     </button>
-</div>
 </template>
 
 <style scoped>

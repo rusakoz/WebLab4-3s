@@ -1,15 +1,41 @@
 package org.lab4.wed.weblab4.controller;
 
-import org.springframework.stereotype.Controller;
+import java.util.List;
+
+import org.lab4.wed.weblab4.db.dto.UserCreateEditDto;
+import org.lab4.wed.weblab4.db.dto.UserReadDto;
+import org.lab4.wed.weblab4.db.entity.Results;
+import org.lab4.wed.weblab4.db.service.ResultService;
+import org.lab4.wed.weblab4.db.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 
-@Controller
+
+@RestController
 @RequestMapping("/reg")
+@RequiredArgsConstructor
 public class RegistrationController {
-    @GetMapping
-    public String registration(){
-        return "Reggg";
+    
+    private final UserService service;
+
+    @PostMapping(value = "/new", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> postMethodName(@RequestBody UserCreateEditDto userDto) {
+        if (service.existsByName(userDto.name())) {
+            return new ResponseEntity<>("Имя пользователя уже занято", HttpStatus.BAD_REQUEST);
+        }
+        
+        service.create(userDto);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

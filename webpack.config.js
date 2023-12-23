@@ -5,6 +5,7 @@ module.exports = {
   mode: 'development',
   devtool: 'source-map',
   entry: path.join(__dirname, 'src', 'main', 'resources', 'static', 'js', 'main.js'), // (*)
+  stats: "errors-only",
   devServer: {
     // до 4-й версии webpack вместо static нужно contentBase: './dist',
     static: {
@@ -15,7 +16,10 @@ module.exports = {
     // то, кому разрешен доступ к серверу webpack
     allowedHosts: [
       'localhost:8887' // адрес сервера
-    ]
+    ],
+    client: {
+      logging: 'error'
+    },
   },
   module: {
     // Прогон всех js файлов через babel-loader
@@ -34,6 +38,14 @@ module.exports = {
       {
         test: /\.vue$/,
         loader: 'vue-loader'
+      },
+      // Прогон всех css файлов через vue-style-loader и css-loader
+      {
+        test: /\.css$/,
+        use: [
+          'vue-style-loader',
+          'css-loader'
+        ]
       }
     ]
   },

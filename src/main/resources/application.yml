@@ -1,6 +1,9 @@
 server:
   port: 8887
 spring:
+  output:
+    ansi:
+      enabled: ALWAYS
   datasource:
     url: jdbc:postgresql://localhost:5432/studs
     username: s338963
@@ -14,3 +17,4 @@ spring:
 logging:
   level:
     root: INFO
+
