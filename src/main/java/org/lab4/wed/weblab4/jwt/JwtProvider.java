@@ -43,7 +43,6 @@ public class JwtProvider {
                 .subject(user.name())
                 .expiration(accessExpiration)
                 .signWith(jwtAccessSecret)
-                .claim("userName", user.name())
                 .compact();
     }
 

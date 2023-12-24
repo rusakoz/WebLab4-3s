@@ -1,13 +1,9 @@
 package org.lab4.wed.weblab4;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.crypto.SecretKey;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import io.jsonwebtoken.security.Keys;
-import jakarta.xml.bind.DatatypeConverter;
 
 @Slf4j
 @SpringBootApplication

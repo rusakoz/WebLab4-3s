@@ -1,18 +1,12 @@
 package org.lab4.wed.weblab4.controller;
 
-import java.util.List;
 
 import org.lab4.wed.weblab4.db.dto.UserCreateEditDto;
-import org.lab4.wed.weblab4.db.dto.UserReadDto;
-import org.lab4.wed.weblab4.db.entity.Results;
-import org.lab4.wed.weblab4.db.service.ResultService;
 import org.lab4.wed.weblab4.db.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;

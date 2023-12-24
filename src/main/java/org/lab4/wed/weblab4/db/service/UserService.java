@@ -23,6 +23,10 @@ public class UserService {
         return repository.findById(id).map(userReadMapper::map);
     }
 
+    public Optional<UserReadDto> findByName(String name){
+        return repository.findByName(name).map(userReadMapper::map);
+    }
+
     public Boolean existsByName(String name){
         return repository.existsByName(name);
     }
