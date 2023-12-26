@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -47,12 +49,14 @@ public class UserRestController {
     @SecurityRequirement(name = "Bearer Authorization")
     @GetMapping("hello")
     public ResponseEntity<String> helloUser() {
+        log.info("check hello");
         final JwtAuthentication authInfo = authJwtService.getAuthInfo();
         return ResponseEntity.ok("Hello user " + authInfo.getPrincipal() + "!");
     }
 
     @PostMapping("login")
     public ResponseEntity<?> login(@RequestBody JwtRequest authRequest) {
+        log.info("check login");
         JwtResponse token;
         try {
             token = authJwtService.login(authRequest);
