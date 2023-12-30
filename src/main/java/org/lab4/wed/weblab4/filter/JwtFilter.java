@@ -5,10 +5,7 @@ import java.io.IOException;
 import org.lab4.wed.weblab4.jwt.JwtAuthentication;
 import org.lab4.wed.weblab4.jwt.JwtProvider;
 import org.lab4.wed.weblab4.jwt.JwtUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -19,34 +16,37 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-// @Component
+// @Component фильтр именованный компонентом Spring будет считаться "глобальным" фильтром 
+// и всегда добавлять в цепочку фильтров, что не всегда нужно, как в этом приложении
 @NoArgsConstructor
 public class JwtFilter extends GenericFilterBean {
     private static final String AUTHORIZATION = "Authorization";
-    @Autowired
-    private JwtProvider jwtProvider;
 
+    public JwtProvider jwtProvider(){
+        return new JwtProvider();
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain fc) 
             throws IOException, ServletException {
-                log.info("Check");
+                log.debug("Filter start");
         final String token = getTokenFromRequest((HttpServletRequest) request);
-        if (token != null && jwtProvider.validateAccessToken(token)) {
-            final Claims claims = jwtProvider.getAccessClaims(token);
+        if (token != null && jwtProvider().validateAccessToken(token)) {
+            final Claims claims = jwtProvider().getAccessClaims(token);
             final JwtAuthentication jwtInfoToken = JwtUtils.generate(claims);
             jwtInfoToken.setAuthenticated(true);
             SecurityContextHolder.getContext().setAuthentication(jwtInfoToken);
         }
         else{
-            ((HttpServletResponse)response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            log.debug("Filter else");
+            ((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            return;
         }
+        log.debug("Filter end");
         fc.doFilter(request, response);
     }
 

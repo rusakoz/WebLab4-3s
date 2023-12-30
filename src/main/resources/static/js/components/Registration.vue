@@ -3,16 +3,11 @@ import {ref} from "vue";
 
 const emit = defineEmits(['responses'])
 
-let auth = ref(false)
-let reg = ref(false)
-function submit(){
-    auth.value = !auth.value
-    emit('responses', auth.value)
-}
+let auth = ref(true)
 
-function toReg(){
-    reg.value = !reg.value
-    emit('resp', reg.value)
+function toLogin(){
+    auth.value = !auth.value
+    emit('resp', auth.value)
 }
 
 </script>
@@ -24,8 +19,9 @@ function toReg(){
                 <div class="login-container">
                     <input type="text" class="name" placeholder="Введите имя">
                     <input type="text" class="password" placeholder="Введите пароль">
-                    <button @click="submit" class="btn-auth">Войти</button>
-                    <h6 class="text-reg">Нет аккаунта? <a @click="toReg" class="link-reg" href="#">Регистрация</a></h6>
+                    <input type="text" class="password" placeholder="Повторите пароль">
+                    <button class="btn-auth">Регистрация</button>
+                    <h6 class="text-reg">Зарегистрированы? <a @click="toLogin" class="link-reg" href="#">Войти</a></h6>
                 </div>
             </div>
         </div>

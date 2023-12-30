@@ -8,7 +8,6 @@ import java.util.Date;
 import javax.crypto.SecretKey;
 
 import org.lab4.wed.weblab4.db.dto.UserReadDto;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -28,11 +27,10 @@ public class JwtProvider {
     private final SecretKey jwtAccessSecret;
     private final SecretKey jwtRefreshSecret;
 
-    public JwtProvider(@Value("${jwt.secret.access}")String jwtAccessSecret, 
-                        @Value("${jwt.secret.refresh}")String jwtRefreshSecret)
+    public JwtProvider()
     {
-        this.jwtAccessSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtAccessSecret));
-        this.jwtRefreshSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtRefreshSecret));
+        this.jwtAccessSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(System.getenv("jwt.secret.access")));
+        this.jwtRefreshSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(System.getenv("jwt.secret.refresh")));
     }
 
     public String generateAccessToken(@NonNull UserReadDto user) {

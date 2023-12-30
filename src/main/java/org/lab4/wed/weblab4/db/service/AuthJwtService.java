@@ -20,8 +20,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthJwtService {
     private final UserService userService;
-    private final JwtProvider jwtProvider;
     private final Map<String, String> refreshStorage = new HashMap<>();
+
+    public JwtProvider jwtProvider(){
+        return new JwtProvider();
+    }
 
     /**
      * Метод ищет пользователя по логину, если пользователь найден и пароль совпадает, 
@@ -34,8 +37,8 @@ public class AuthJwtService {
         final UserReadDto user = userService.findByName(authRequest.getUserLogin())
                 .orElseThrow(() -> new AuthException("Пользователь не найден"));
         if (user.password().equals(authRequest.getUserPassword())) {
-            final String accessToken = jwtProvider.generateAccessToken(user);
-            final String refreshToken = jwtProvider.generateRefreshToken(user);
+            final String accessToken = jwtProvider().generateAccessToken(user);
+            final String refreshToken = jwtProvider().generateRefreshToken(user);
             refreshStorage.put(user.name(), refreshToken);
             return new JwtResponse(accessToken, refreshToken);
         } else {
@@ -52,14 +55,14 @@ public class AuthJwtService {
      * @throws AuthException выбрасывается, если пользователь не найден
      */
     public JwtResponse getAccessToken(@NonNull String refreshToken) throws AuthException {
-        if (jwtProvider.validateRefreshToken(refreshToken)) {
-            final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
+        if (jwtProvider().validateRefreshToken(refreshToken)) {
+            final Claims claims = jwtProvider().getRefreshClaims(refreshToken);
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 final UserReadDto user = userService.findByName(login)
                         .orElseThrow(() -> new AuthException("Пользователь не найден"));
-                final String accessToken = jwtProvider.generateAccessToken(user);
+                final String accessToken = jwtProvider().generateAccessToken(user);
                 return new JwtResponse(accessToken, null);
             }
         }
@@ -75,15 +78,15 @@ public class AuthJwtService {
      * @throws AuthException выбрасывается, если пользователь не найден или refreshToken не валиден
      */
     public JwtResponse refresh(@NonNull String refreshToken) throws AuthException {
-        if (jwtProvider.validateRefreshToken(refreshToken)) {
-            final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
+        if (jwtProvider().validateRefreshToken(refreshToken)) {
+            final Claims claims = jwtProvider().getRefreshClaims(refreshToken);
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 final UserReadDto user = userService.findByName(login)
                         .orElseThrow(() -> new AuthException("Пользователь не найден"));
-                final String accessToken = jwtProvider.generateAccessToken(user);
-                final String newRefreshToken = jwtProvider.generateRefreshToken(user);
+                final String accessToken = jwtProvider().generateAccessToken(user);
+                final String newRefreshToken = jwtProvider().generateRefreshToken(user);
                 refreshStorage.put(user.name(), newRefreshToken);
                 return new JwtResponse(accessToken, newRefreshToken);
             }
