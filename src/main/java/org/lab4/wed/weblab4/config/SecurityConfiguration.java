@@ -18,14 +18,14 @@ import org.springframework.security.web.firewall.StrictHttpFirewall;
 public class SecurityConfiguration {
     private static final String[] ORDER_1_SECURITY_WHITE_LIST = {
         "/", 
-        "/assets/**", "/js/**", "/images/**", "/error**",
+        "/assets/**", "/js/**", "/images/**", "/error**", "/favicon**",
         "/v3/api-docs/**", "/swagger-ui/**", 
         "/user/login", "/user/token", "/user/reg"
     };
 
     private static final String[] ORDER_1_AUTHORIZE_WHITE_LIST = {
         "/", 
-        "/assets/**", "/js/**", "/images/**", "/error**",
+        "/assets/**", "/js/**", "/images/**", "/error**", "/favicon**",
         "/v3/api-docs/**", "/swagger-ui/**", 
         "/user/login", "/user/token", "/user/reg"
     };

@@ -1,13 +1,86 @@
+<template>
+    <div class="main-container">
+        <div class="container">
+            <div class="wrapper-container">
+                <div class="login-container">
+                  <!-- <pre>{{ form }}</pre> -->
+                    <small v-if="authErr" class="errors">Неверный логин или пароль</small>
+                    <div class="form-control" :class="{invalid: !form.name.valid && form.name.touched}">
+                      <label>Имя</label>
+                      <input class="name" placeholder="Введите имя" v-model="form.name.value" @blur="form.name.blur">
+                      <small v-if="form.name.errors.required && form.name.touched" class="errors">Введите имя</small>
+                    </div>
+                    <div class="form-control" :class="{invalid: !form.password.valid && form.password.touched}">
+                      <label>Пароль</label>
+                      <input class="password" placeholder="Введите пароль" v-model="form.password.value" @blur="form.password.blur">
+                      <small v-if="form.password.errors.required && form.password.touched" class="errors">Введите пароль</small>
+                      <small v-else-if="form.password.errors.minLength && form.password.touched" class="errors">
+                        Введено {{ form.password.value.length }} символов из 8.
+                      </small>
+                    </div>
+                    <button @click="submit" class="btn-auth" :disabled="!form.valid">Войти</button>
+                    <h6 class="text-reg">Нет аккаунта? <a @click="toReg" class="link-reg" href="#">Регистрация</a></h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
 <script setup>
 import {ref} from "vue";
+import { useForm } from "use/form";
 
 const emit = defineEmits(['responses'])
 
+const required = val => !!val
+const minLength = num => val => val.length >= num
+
+let authErr = ref(false)
+
+const form = useForm({
+  name: {
+    value: '',
+    validators: {required}
+  },
+  password: {
+    value: '',
+    validators: {required, minLength: minLength(8)}
+  }
+})
+
+console.log(form.password)
+
 let auth = ref(false)
 let reg = ref(false)
-function submit(){
-    auth.value = !auth.value
-    emit('responses', auth.value)
+
+async function submit(){
+    const formData = {
+      userName: "string",
+      userPassword: "string"
+    }
+    console.log(form.name.value)
+    console.log(form.password.value)
+    const res = await fetch("/user/login", {
+      method: "POST",
+      headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        {
+        userLogin: form.name.value, 
+        userPassword: form.password.value
+        })
+    })
+    const resJson = res.json()
+    if(res.status === 200){
+      resJson.then((res)=>{console.log(res)})
+      auth.value = !auth.value
+      emit('responses', auth.value)
+    }else{
+      authErr.value = true
+      resJson.then((res)=>{console.log(res.error)})
+    }
 }
 
 function toReg(){
@@ -16,21 +89,6 @@ function toReg(){
 }
 
 </script>
-
-<template>
-    <div class="main-container">
-        <div class="container">
-            <div class="wrapper-container">
-                <div class="login-container">
-                    <input type="text" class="name" placeholder="Введите имя">
-                    <input type="text" class="password" placeholder="Введите пароль">
-                    <button @click="submit" class="btn-auth">Войти</button>
-                    <h6 class="text-reg">Нет аккаунта? <a @click="toReg" class="link-reg" href="#">Регистрация</a></h6>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
 
 <style scoped>
     .main-container{
@@ -82,7 +140,6 @@ function toReg(){
     height: 30px;
     border-radius: 0.5rem;
     border: 0;
-    margin-top: 7px;
     width: 100%;
   }
 
@@ -117,4 +174,22 @@ function toReg(){
   .link-reg{
     color: rgb(30, 20, 98);
   }
+  
+  .form-control.invalid input{
+    border: 2px solid;
+    border-color: rgb(216, 97, 0);
+  }
+
+  .errors{
+    color: rgb(28, 28, 28);
+    font-size: 11px;
+    margin-left: 3px;
+  }
+
+  .btn-auth:disabled{
+    cursor: default;
+    color: #212529;
+    background-color: #848688;
+  }
+
 </style>

@@ -54,14 +54,14 @@ public class UserRestController {
         return ResponseEntity.ok("Hello user " + authInfo.getPrincipal() + "!");
     }
 
-    @PostMapping("login")
+    @PostMapping(value = "login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody JwtRequest authRequest) {
         log.info("check login");
         JwtResponse token;
         try {
             token = authJwtService.login(authRequest);
         } catch (AuthException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("{\"error\":\""+ e.getMessage() +"\"}", HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.ok(token);
     }
