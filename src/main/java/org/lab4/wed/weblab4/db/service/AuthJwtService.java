@@ -8,6 +8,7 @@ import org.lab4.wed.weblab4.jwt.JwtAuthentication;
 import org.lab4.wed.weblab4.jwt.JwtProvider;
 import org.lab4.wed.weblab4.jwt.JwtRequest;
 import org.lab4.wed.weblab4.jwt.JwtResponse;
+import org.lab4.wed.weblab4.security.BcryptEncoder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthJwtService {
@@ -37,14 +37,14 @@ public class AuthJwtService {
      */
     public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException {
         final UserReadDto user = userService.findByName(authRequest.getUserLogin())
-                .orElseThrow(() -> new AuthException("Пользователь не найден"));
-        if (user.password().equals(authRequest.getUserPassword())) {
+                .orElseThrow(() -> new AuthException("Неверный логин или пароль"));
+        if (BcryptEncoder.checkPass(authRequest.getUserPassword(), user.password())) {
             final String accessToken = jwtProvider().generateAccessToken(user);
             final String refreshToken = jwtProvider().generateRefreshToken(user);
             refreshStorage.put(user.name(), refreshToken);
             return new JwtResponse(accessToken, refreshToken);
         } else {
-            throw new AuthException("Неправильный пароль");
+            throw new AuthException("Неверный логин или пароль");
         }
     }
 
@@ -74,7 +74,7 @@ public class AuthJwtService {
     /**
      * Метод принимает refreshToken, валидирует его, если валиден, то получает из него claim с логином пользователя.
      * По логину в хранилище(refreshStorage) находим refreshToken, который сверяем с присланным токеном от пользователя,
-     * если токены совпал, то отправляем обхект user в JwtProvider, который генерирует новый accessToken и refreshToken
+     * если токены совпали, то отправляем объект user в JwtProvider, который генерирует новый accessToken и refreshToken
      * @param refreshToken
      * @return JwtResponse с новыми accessToken и refreshToken
      * @throws AuthException выбрасывается, если пользователь не найден или refreshToken не валиден

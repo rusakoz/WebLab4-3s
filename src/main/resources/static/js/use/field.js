@@ -11,8 +11,12 @@ export function useField(field){
     const checkValid = val =>{
         valid.value = true
         Object.keys(field.validators ?? {}).map(name =>{
+            console.log(value.value, 'field value')
+            console.log(name, 'name')
+            console.log(val, 'val')
             const isValid = field.validators[name](val)
             errors[name] = not(isValid)
+            console.log(isValid)
             if (not(isValid)) {
                 valid.value = false
             }

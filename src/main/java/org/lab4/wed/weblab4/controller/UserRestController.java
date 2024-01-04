@@ -37,13 +37,13 @@ public class UserRestController {
 
     @PostMapping(value = "/reg", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registration(@RequestBody UserCreateEditDto userDto) {
-        if (userService.existsByName(userDto.name())) {
-            return new ResponseEntity<>("Имя пользователя уже занято", HttpStatus.BAD_REQUEST);
+        if (userService.existsByName(userDto.getName())) {
+            return new ResponseEntity<>("{\"error\":\""+ "Имя занято" +"\"}", HttpStatus.OK);
         }
         
         userService.create(userDto);
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>("{\"status\":\""+ "Created" +"\"}", HttpStatus.CREATED);
     }
 
     @SecurityRequirement(name = "Bearer Authorization")
@@ -61,7 +61,7 @@ public class UserRestController {
         try {
             token = authJwtService.login(authRequest);
         } catch (AuthException e) {
-            return new ResponseEntity<>("{\"error\":\""+ e.getMessage() +"\"}", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("{\"error\":\""+ e.getMessage() +"\"}", HttpStatus.OK);
         }
         return ResponseEntity.ok(token);
     }

@@ -1,5 +1,6 @@
 package org.lab4.wed.weblab4.db.service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.lab4.wed.weblab4.db.dto.UserCreateEditDto;
@@ -7,6 +8,7 @@ import org.lab4.wed.weblab4.db.dto.UserReadDto;
 import org.lab4.wed.weblab4.db.repository.UserRepository;
 import org.lab4.wed.weblab4.mapper.UserCreateEditMapper;
 import org.lab4.wed.weblab4.mapper.UserReadMapper;
+import org.lab4.wed.weblab4.security.BcryptEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,8 @@ public class UserService {
     }
 
     public UserReadDto create(UserCreateEditDto userDto){
+        userDto.setPassword(BcryptEncoder.encode(userDto.getPassword()));
+        userDto.setDateOfCreation(LocalDate.now());
         return Optional.of(userDto)
             .map(userCreateEditMapper::map)
             .map(repository::save)

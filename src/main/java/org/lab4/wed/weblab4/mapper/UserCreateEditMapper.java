@@ -10,9 +10,9 @@ public class UserCreateEditMapper implements Mapper<UserCreateEditDto, Users>{
     @Override
     public Users map(UserCreateEditDto object) {
         Users user = new Users();
-        user.setName(object.name());
-        user.setPassword(object.password());
-        user.setDateOfCreation(object.dateOfCreation());
+        user.setName(object.getName());
+        user.setPassword(object.getPassword());
+        user.setDateOfCreation(object.getDateOfCreation());
         return user;
     }
     

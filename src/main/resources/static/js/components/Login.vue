@@ -4,7 +4,7 @@
             <div class="wrapper-container">
                 <div class="login-container">
                   <!-- <pre>{{ form }}</pre> -->
-                    <small v-if="authErr" class="errors">Неверный логин или пароль</small>
+                    <small v-if="authErr" class="errors">{{ authErrText }}</small>
                     <div class="form-control" :class="{invalid: !form.name.valid && form.name.touched}">
                       <label>Имя</label>
                       <input class="name" placeholder="Введите имя" v-model="form.name.value" @blur="form.name.blur">
@@ -12,10 +12,10 @@
                     </div>
                     <div class="form-control" :class="{invalid: !form.password.valid && form.password.touched}">
                       <label>Пароль</label>
-                      <input class="password" placeholder="Введите пароль" v-model="form.password.value" @blur="form.password.blur">
+                      <input class="password" type="password" placeholder="Введите пароль" v-model="form.password.value" @blur="form.password.blur">
                       <small v-if="form.password.errors.required && form.password.touched" class="errors">Введите пароль</small>
                       <small v-else-if="form.password.errors.minLength && form.password.touched" class="errors">
-                        Введено {{ form.password.value.length }} символов из 8.
+                        Символов введено {{ form.password.value.length }} из {{ minPassLength }}.
                       </small>
                     </div>
                     <button @click="submit" class="btn-auth" :disabled="!form.valid">Войти</button>
@@ -27,15 +27,18 @@
 </template>
 
 <script setup>
-import {ref} from "vue";
-import { useForm } from "use/form";
+import { ref } from "vue"
+import { useForm } from "use/form"
+import { useSubmitForm } from "use/submitForm"
 
-const emit = defineEmits(['responses'])
+const emit = defineEmits(['auth'])
 
 const required = val => !!val
 const minLength = num => val => val.length >= num
+const minPassLength = 6
 
 let authErr = ref(false)
+let authErrText = ref('')
 
 const form = useForm({
   name: {
@@ -44,48 +47,49 @@ const form = useForm({
   },
   password: {
     value: '',
-    validators: {required, minLength: minLength(8)}
+    validators: {required, minLength: minLength(minPassLength)}
   }
 })
-
-console.log(form.password)
 
 let auth = ref(false)
 let reg = ref(false)
 
 async function submit(){
-    const formData = {
-      userName: "string",
-      userPassword: "string"
-    }
-    console.log(form.name.value)
-    console.log(form.password.value)
-    const res = await fetch("/user/login", {
-      method: "POST",
-      headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(
-        {
-        userLogin: form.name.value, 
-        userPassword: form.password.value
-        })
-    })
-    const resJson = res.json()
-    if(res.status === 200){
-      resJson.then((res)=>{console.log(res)})
-      auth.value = !auth.value
-      emit('responses', auth.value)
-    }else{
+
+    const res = await useSubmitForm("/user/login", {userLogin: form.name.value, 
+                                                     userPassword: form.password.value
+                                                    }
+    ).catch(()=>{
+      authErrText.value = "Ошибка авторизации"
       authErr.value = true
-      resJson.then((res)=>{console.log(res.error)})
+    })
+
+    const resJson = res.json()
+
+    if(res.status === 200){
+      let errorText
+      await resJson.then((res)=>{errorText = res.error})
+
+      if(typeof errorText !== 'undefined'){
+        authErrText.value = errorText
+        authErr.value = true
+      }else{
+        resJson.then((res)=>{
+            localStorage.setItem('userAccessToken', res.accessToken)
+            localStorage.setItem('userRefreshToken', res.refreshToken)
+          })
+        auth.value = !auth.value
+        emit('auth', auth.value)
+      }
+    }else{
+      authErrText.value = "Ошибка авторизации"
+      authErr.value = true
     }
 }
 
 function toReg(){
     reg.value = !reg.value
-    emit('resp', reg.value)
+    emit('logToReg', reg.value)
 }
 
 </script>
