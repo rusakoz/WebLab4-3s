@@ -1,20 +1,24 @@
 <template>
-  <Header v-if="isAuth"/>
+  <Header @auth="(status) => flag = status" v-if="isLoggin"/>
   <!-- <p>{{ auth }}</p> -->
-  <Main v-if="isAuth"/>
-  <Auth @auth="(status) => isAuth = status" v-else-if="!isAuth"/>
+  <Main v-if="isLoggin"/>
+  <Auth @auth="(status) => flag = status" v-else-if="!isLoggin"/>
 
-  <Footer v-if="isAuth"/>
+  <Footer v-if="isLoggin"/>
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import { ref } from 'vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import Main from './components/Main.vue'
 import Auth from './components/Auth.vue'
+import { useIsLogged } from 'use/isLogged'
 
-let isAuth = ref(false)
+const isLoggin = ref(false)
+const flag = ref(false)
+
+useIsLogged(isLoggin, 'isLoggin', flag)
 
 console.log("start")
 

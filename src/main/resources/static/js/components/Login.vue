@@ -51,7 +51,6 @@ const form = useForm({
   }
 })
 
-let auth = ref(false)
 let reg = ref(false)
 
 async function submit(){
@@ -77,9 +76,9 @@ async function submit(){
         resJson.then((res)=>{
             localStorage.setItem('userAccessToken', res.accessToken)
             localStorage.setItem('userRefreshToken', res.refreshToken)
+            localStorage.setItem('isLoggin', true)
           })
-        auth.value = !auth.value
-        emit('auth', auth.value)
+        emit('auth', true)
       }
     }else{
       authErrText.value = "Ошибка авторизации"

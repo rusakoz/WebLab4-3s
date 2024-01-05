@@ -1,17 +1,16 @@
-<script setup>
-import Clock from './Clock.vue'
-</script>
-
 <template>
-    <div class="main-container">
-        <div class="container">
-            <h1 class="title">Hello my dear friend</h1>
-            <p class="subtitle">This is demo site</p>
-            <p class="top-text">Press F for change location</p>
-            <Clock/>
-        </div>
-    </div>
+    <Hello @toGraph="()=>flag = !flag" v-if="flag"/>
+    <Graph v-else-if="!flag"/>
 </template>
+
+<script setup>
+import {ref} from "vue"
+import Graph from 'components/mainContents/Graph.vue';
+import Hello from 'components/mainContents/Hello.vue';
+
+const flag = ref(true)
+
+</script>
 
 <style scoped>
 

@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import {ref} from "vue"
+import { ref } from "vue"
 import { useFormReg } from "use/formReg"
 import { useSubmitForm } from "use/submitForm"
 
