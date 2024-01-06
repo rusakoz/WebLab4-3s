@@ -7,7 +7,6 @@ export function useField(field){
     const value = ref(field.value)
     const errors = reactive({})
     const touched = ref(false)
-    
     const checkValid = val =>{
         valid.value = true
         Object.keys(field.validators ?? {}).map(name =>{
