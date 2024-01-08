@@ -1,5 +1,5 @@
-export function useSubmitForm(url = "", json = {}){
-    const res = fetch(url, {
+export function useFetchPost(url = "", json = {}){
+    const response = fetch(url, {
         method: "POST",
         headers: {
         'Accept': 'application/json',
@@ -7,5 +7,5 @@ export function useSubmitForm(url = "", json = {}){
         },
         body: JSON.stringify(json)
       })
-      return res
+      return response
 }

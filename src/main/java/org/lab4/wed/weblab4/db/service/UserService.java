@@ -34,12 +34,16 @@ public class UserService {
     }
 
     public UserReadDto create(UserCreateEditDto userDto){
-        userDto.setPassword(BcryptEncoder.encode(userDto.getPassword()));
-        userDto.setDateOfCreation(LocalDate.now());
         return Optional.of(userDto)
             .map(userCreateEditMapper::map)
             .map(repository::save)
             .map(userReadMapper::map)
             .orElseThrow();
+    }
+
+    public UserReadDto registration(UserCreateEditDto userDto){
+        userDto.setPassword(BcryptEncoder.encode(userDto.getPassword()));
+        userDto.setDateOfCreation(LocalDate.now());
+        return create(userDto);
     }
 }

@@ -16,7 +16,6 @@ import io.jsonwebtoken.Claims;
 import jakarta.security.auth.message.AuthException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +50,7 @@ public class AuthJwtService {
     /**
      * Метод принимает refreshToken, валидирует его, если валиден, то получает из него claim с логином пользователя.
      * По логину в хранилище(refreshStorage) находим refreshToken, который сверяем с присланным токеном от пользователя, 
-     * если токены совпал, то отправляем обхект user в JwtProvider, который генерирует новый accessToken
+     * если токены совпали, то отправляем объект user в JwtProvider, который генерирует новый accessToken
      * @param refreshToken 
      * @return JwtResponse с новым accessToken
      * @throws AuthException выбрасывается, если пользователь не найден

@@ -6,7 +6,8 @@ public class JwtUtils {
 
     public static JwtAuthentication generate(Claims claims) {
         final JwtAuthentication jwtInfoToken = new JwtAuthentication();
-        jwtInfoToken.setUsername(claims.getSubject());
+        jwtInfoToken.setUserName(claims.getSubject());
+        jwtInfoToken.setUserId(Long.parseLong(claims.get("id").toString()));
         return jwtInfoToken;
     }
 }

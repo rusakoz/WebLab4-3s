@@ -25,5 +25,6 @@ public class Results implements BaseEntity<Long> {
     private LocalDateTime date;
     @Column(name = "exec_time")
     private long execTime;
-
+    @Column(name = "user_id")
+    private long userId;
 }

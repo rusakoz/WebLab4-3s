@@ -41,6 +41,7 @@ public class JwtProvider {
                 .subject(user.name())
                 .expiration(accessExpiration)
                 .signWith(jwtAccessSecret)
+                .claim("id", user.id())
                 .compact();
     }
 
@@ -52,6 +53,7 @@ public class JwtProvider {
                 .subject(user.name())
                 .expiration(refreshExpiration)
                 .signWith(jwtRefreshSecret)
+                .claim("id", user.id())
                 .compact();
     }
 

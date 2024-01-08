@@ -5,3 +5,14 @@ CREATE TABLE users(
     date_creation date not null
 );
 
+CREATE TABLE results(
+    id bigserial primary key,
+    x double precision not null,
+    y double precision not null,
+    r double precision not null,
+    hit boolean not null,
+    date timestamp not null,
+    exec_time bigint not null,
+    user_id bigint not null
+);
+

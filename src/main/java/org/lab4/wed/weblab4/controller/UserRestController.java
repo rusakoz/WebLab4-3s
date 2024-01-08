@@ -1,10 +1,8 @@
 package org.lab4.wed.weblab4.controller;
 
 import org.lab4.wed.weblab4.db.dto.UserCreateEditDto;
-import org.lab4.wed.weblab4.db.dto.UserReadDto;
 import org.lab4.wed.weblab4.db.service.AuthJwtService;
 import org.lab4.wed.weblab4.db.service.UserService;
-import org.lab4.wed.weblab4.jwt.JwtAuthentication;
 import org.lab4.wed.weblab4.jwt.JwtRequest;
 import org.lab4.wed.weblab4.jwt.JwtResponse;
 import org.lab4.wed.weblab4.jwt.RefreshJwtRequest;
@@ -18,7 +16,6 @@ import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -28,30 +25,15 @@ public class UserRestController {
     private final AuthJwtService authJwtService;
     private final UserService userService;
 
-    @GetMapping("/{id}")
-    public UserReadDto login(@PathVariable("id") Long id){
-        Optional<UserReadDto> userReadDto = userService.findById(id);
-
-        return userReadDto.orElseThrow();
-    }
-
     @PostMapping(value = "/reg", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registration(@RequestBody UserCreateEditDto userDto) {
         if (userService.existsByName(userDto.getName())) {
             return new ResponseEntity<>("{\"error\":\""+ "Имя занято" +"\"}", HttpStatus.OK);
         }
         
-        userService.create(userDto);
+        userService.registration(userDto);
 
         return new ResponseEntity<>("{\"status\":\""+ "Created" +"\"}", HttpStatus.CREATED);
-    }
-
-    @SecurityRequirement(name = "Bearer Authorization")
-    @GetMapping("hello")
-    public ResponseEntity<String> helloUser() {
-        log.info("check hello");
-        final JwtAuthentication authInfo = authJwtService.getAuthInfo();
-        return ResponseEntity.ok("Hello user " + authInfo.getPrincipal() + "!");
     }
 
     @PostMapping(value = "login", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -66,14 +48,13 @@ public class UserRestController {
         return ResponseEntity.ok(token);
     }
 
-    @SecurityRequirement(name = "Bearer Authorization")
     @PostMapping("token")
     public ResponseEntity<?> getNewAccessToken(@RequestBody RefreshJwtRequest request) {
         JwtResponse token;
         try {
             token = authJwtService.getAccessToken(request.getRefreshToken());
         } catch (AuthException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("{\"error\":\""+ e.getMessage() +"\"}", HttpStatus.OK);
         }
         return ResponseEntity.ok(token);
     }
@@ -81,13 +62,13 @@ public class UserRestController {
     @SecurityRequirement(name = "Bearer Authorization")
     @PostMapping("refresh")
     public ResponseEntity<?> getNewRefreshToken(@RequestBody RefreshJwtRequest request) {
-        JwtResponse token;
+        JwtResponse tokens;
         try {
-            token = authJwtService.refresh(request.getRefreshToken());
+            tokens = authJwtService.refresh(request.getRefreshToken());
         } catch (AuthException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("{\"error\":\""+ e.getMessage() +"\"}", HttpStatus.OK);
         }
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(tokens);
     }
 
 }

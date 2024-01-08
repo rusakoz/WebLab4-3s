@@ -29,7 +29,7 @@
 <script setup>
 import { ref } from "vue"
 import { useForm } from "use/form"
-import { useSubmitForm } from "use/submitForm"
+import { useFetchPost } from "use/fetchPost"
 
 const emit = defineEmits(['auth'])
 
@@ -55,7 +55,7 @@ let reg = ref(false)
 
 async function submit(){
 
-    const res = await useSubmitForm("/user/login", {userLogin: form.name.value, 
+    const response = await useFetchPost("/user/login", {userLogin: form.name.value, 
                                                      userPassword: form.password.value
                                                     }
     ).catch(()=>{
@@ -63,9 +63,9 @@ async function submit(){
       authErr.value = true
     })
 
-    const resJson = res.json()
+    if(response.status === 200){
+      const resJson = response.json()
 
-    if(res.status === 200){
       let errorText
       await resJson.then((res)=>{errorText = res.error})
 

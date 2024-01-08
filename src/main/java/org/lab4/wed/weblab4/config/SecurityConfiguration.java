@@ -37,7 +37,7 @@ public class SecurityConfiguration {
     @Bean
     public StrictHttpFirewall httpFirewall() {
     StrictHttpFirewall firewall = new StrictHttpFirewall();
-    firewall.setAllowedHttpMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+    firewall.setAllowedHttpMethods(Arrays.asList("GET", "POST"));
     return firewall;
 }
     

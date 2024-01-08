@@ -39,7 +39,7 @@
 <script setup>
 import { ref } from "vue"
 import { useFormReg } from "use/formReg"
-import { useSubmitForm } from "use/submitForm"
+import { useFetchPost } from "use/fetchPost"
 
 const emit = defineEmits(['auth'])
 
@@ -75,7 +75,7 @@ const regErr = ref(false)
 
 async function submit(){
 
-  const res = await useSubmitForm("/user/reg", {name: form.name.value, 
+  const res = await useFetchPost("/user/reg", {name: form.name.value, 
                                                   password: form.password.value
                                                 }
   ).catch(()=>{
