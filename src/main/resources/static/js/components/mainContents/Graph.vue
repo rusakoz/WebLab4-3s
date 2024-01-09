@@ -149,7 +149,7 @@ const loadErr = ref(false)
 
 async function loadTable(){
     function fetch(){
-        return useGetTableData('/result/gett', 
+        return useGetTableData('/result/get', 
                         {
                             'Accept': 'application/json',
                             'Content-Type': 'application/json',

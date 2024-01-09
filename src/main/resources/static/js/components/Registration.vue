@@ -40,10 +40,9 @@
 import { ref } from "vue"
 import { useFormReg } from "use/formReg"
 import { useFetchPost } from "use/fetchPost"
+import { useRouter } from 'vue-router'
 
-const emit = defineEmits(['auth'])
-
-let reg = ref(true)
+const router = useRouter()
 
 const minPassLength = 6
 
@@ -66,8 +65,7 @@ const form = useFormReg({
 })
 
 function toLogin(){
-    reg.value = !reg.value
-    emit('regToLog', reg.value)
+  router.push('/login')
 }
 
 const regErrText = ref('')
@@ -94,7 +92,7 @@ async function submit(){
         regErr.value = true
       }else{
         reg.value = !reg.value
-        emit('regToLog', reg.value)
+        router.push('/login')
       }
     }else{
       regErrText.value = "Ошибка регистрации"

@@ -30,8 +30,8 @@ public class SecurityConfiguration {
         "/user/login", "/user/token", "/user/reg"
     };
 
-    private static final String[] ORDER_2_SECURITY_WHITE_LIST = {
-        "/**"
+    private static final String[] ORDER_2_SECURITY_CHECK_LIST = {
+        "/result/get", "/result/save", "/user/refresh"
     };
 
     @Bean
@@ -63,7 +63,7 @@ public class SecurityConfiguration {
     @Bean
     @Order(2)
     public SecurityFilterChain securityFilterChainTwo(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf(CsrfConfigurer::disable).securityMatcher(ORDER_2_SECURITY_WHITE_LIST)
+        httpSecurity.csrf(CsrfConfigurer::disable).securityMatcher(ORDER_2_SECURITY_CHECK_LIST)
                 .authorizeHttpRequests(auth -> {
                         auth.anyRequest().authenticated();
                     })

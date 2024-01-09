@@ -28,10 +28,13 @@
 
 <script setup>
 import { ref } from "vue"
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import { useForm } from "use/form"
 import { useFetchPost } from "use/fetchPost"
 
-const emit = defineEmits(['auth'])
+const router = useRouter()
+const store = useStore()
 
 const required = val => !!val
 const minLength = num => val => val.length >= num
@@ -50,8 +53,6 @@ const form = useForm({
     validators: {required, minLength: minLength(minPassLength)}
   }
 })
-
-let reg = ref(false)
 
 async function submit(){
 
@@ -77,8 +78,9 @@ async function submit(){
             localStorage.setItem('userAccessToken', res.accessToken)
             localStorage.setItem('userRefreshToken', res.refreshToken)
             localStorage.setItem('isLoggin', true)
+            store.commit('setAuthValue', true)
           })
-        emit('auth', true)
+        router.replace('/hello')
       }
     }else{
       authErrText.value = "Ошибка авторизации"
@@ -87,8 +89,7 @@ async function submit(){
 }
 
 function toReg(){
-    reg.value = !reg.value
-    emit('logToReg', reg.value)
+    router.replace('/registration')
 }
 
 </script>

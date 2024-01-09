@@ -6,8 +6,11 @@
     "start": "webpack-dev-server"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
     "vue": "^3.4.5",
-    "vue-resource": "^1.5.3"
+    "vue-resource": "^1.5.3",
+    "vue-router": "^4.2.5",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.7",

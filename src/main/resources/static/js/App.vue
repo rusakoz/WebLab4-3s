@@ -1,26 +1,37 @@
 <template>
-  <Header @auth="(status) => flag = status" v-if="isLoggin"/>
-  <!-- <p>{{ auth }}</p> -->
-  <Main v-if="isLoggin"/>
-  <Auth @auth="(status) => flag = status" v-else-if="!isLoggin"/>
+  <Header v-if="is"/>
 
-  <Footer v-if="isLoggin"/>
+  <router-view></router-view>
+
+  <!-- <Footer v-if="is"/> -->
+  
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import Header from './components/Header.vue'
-import Footer from './components/Footer.vue'
-import Main from './components/Main.vue'
-import Auth from './components/Auth.vue'
-import { useIsLogged } from 'use/isLogged'
+import { computed, onBeforeMount } from 'vue'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+import Header from 'components/Header.vue'
+import Footer from 'components/Footer.vue'
 
-const isLoggin = ref(false)
-const flag = ref(false)
+const router = useRouter()
+const store = useStore()
 
-useIsLogged(isLoggin, 'isLoggin', flag)
+const is = computed(() => store.state.isAuth)
 
-console.log("start")
+router.beforeEach(async (to, from) => {
+  store.commit('setAuthValue', localStorage.getItem('isLoggin'))
+  
+  // Если не авторизован пользователь, то открыт доступ к /login и /registration
+  if (!is.value && to.name !== 'Login' && to.name !== 'Registration') {
+    return { name: 'Login' }
+  }
+  //Если пользователь авторизован, то доступ к /login и /registration закрыт
+  if(is.value && (to.name === 'Registration' || to.name === 'Login')){
+    return { from }
+  }
+
+})
 
 </script>
 

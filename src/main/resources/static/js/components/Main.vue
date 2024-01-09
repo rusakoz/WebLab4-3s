@@ -1,6 +1,5 @@
 <template>
-    <Hello @toGraph="()=>flag = !flag" v-if="flag"/>
-    <Graph v-else-if="!flag"/>
+
 </template>
 
 <script setup>
