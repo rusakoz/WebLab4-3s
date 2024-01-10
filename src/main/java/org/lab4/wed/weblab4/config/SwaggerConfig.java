@@ -33,15 +33,15 @@ public class SwaggerConfig {
             //         .description("header Authorization")
             //         .required(true);
                     
-            Parameter missingParam2 = new Parameter()
-                    .in(ParameterIn.HEADER.toString())
-                    .schema(new StringSchema())
-                    .name("refreshToken")
-                    .description("header description2")
-                    .required(true);
+            // Parameter missingParam2 = new Parameter()
+            //         .in(ParameterIn.HEADER.toString())
+            //         .schema(new StringSchema())
+            //         .name("refreshToken")
+            //         .description("header description2")
+            //         .required(true);
 
-            // operation.addParametersItem(missingParam1);
-            operation.addParametersItem(missingParam2);
+            // // operation.addParametersItem(missingParam1);
+            // operation.addParametersItem(missingParam2);
 
             return operation;
         };

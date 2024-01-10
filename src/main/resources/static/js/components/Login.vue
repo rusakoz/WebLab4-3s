@@ -19,7 +19,9 @@
                       </small>
                     </div>
                     <button @click="submit" class="btn-auth" :disabled="!form.valid">Войти</button>
-                    <h6 class="text-reg">Нет аккаунта? <a @click="toReg" class="link-reg" href="#">Регистрация</a></h6>
+                    <h6 class="text-reg">Нет аккаунта? 
+                        <router-link to="/registration" class="link-reg">Регистрация</router-link>
+                    </h6>
                 </div>
             </div>
         </div>
@@ -30,8 +32,8 @@
 import { ref } from "vue"
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { useForm } from "use/form"
-import { useFetchPost } from "use/fetchPost"
+import { useForm } from "use/validForm/form"
+import { useFetchPost } from "use/requests/fetchPost"
 
 const router = useRouter()
 const store = useStore()
@@ -86,10 +88,6 @@ async function submit(){
       authErrText.value = "Ошибка авторизации"
       authErr.value = true
     }
-}
-
-function toReg(){
-    router.replace('/registration')
 }
 
 </script>

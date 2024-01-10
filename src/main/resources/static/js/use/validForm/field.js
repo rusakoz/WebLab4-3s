@@ -7,6 +7,7 @@ export function useField(field){
     const value = ref(field.value)
     const errors = reactive({})
     const touched = ref(false)
+    
     const checkValid = val =>{
         valid.value = true
         Object.keys(field.validators ?? {}).map(name =>{
@@ -18,8 +19,8 @@ export function useField(field){
         })
     }
 
-    watch(value, checkValid)
+    watch(value, checkValid, {immediate: true})
 
-    checkValid(value.value)
+    //checkValid(value.value)
     return {value, valid, errors, touched, blur: () => touched.value = true}
 }

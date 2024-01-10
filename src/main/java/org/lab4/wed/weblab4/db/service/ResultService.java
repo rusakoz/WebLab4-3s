@@ -10,6 +10,7 @@ import org.lab4.wed.weblab4.db.entity.Results;
 import org.lab4.wed.weblab4.db.repository.ResultRepository;
 import org.lab4.wed.weblab4.mapper.ResultsCreateEditMapper;
 import org.lab4.wed.weblab4.mapper.ResultsReadMapper;
+import org.lab4.wed.weblab4.model.CheckHit;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -41,8 +42,15 @@ public class ResultService {
     }
 
 
-    public ResultsReadDto createNew(ResultsCreateEditDto resultsDto){
+    public ResultsReadDto checkHitAndCreateNew(ResultsCreateEditDto resultsDto){
+        final long startCheck = System.nanoTime();
+        final boolean hit = CheckHit.checkHit(resultsDto.getX(), resultsDto.getY(), resultsDto.getR());
+        final long stopCheck = System.nanoTime();
+
         resultsDto.setDate(LocalDateTime.now());
+        resultsDto.setExecTime(stopCheck - startCheck);
+        resultsDto.setHit(hit);
+        
         return create(resultsDto);
     }
 }

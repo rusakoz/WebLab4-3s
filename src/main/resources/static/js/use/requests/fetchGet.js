@@ -1,4 +1,4 @@
-export function useGetTableData(url = "", headers = {}){
+export function useFetchGet(url = "", headers = {}){
     const res = fetch(url, {
         method: "GET",
         headers

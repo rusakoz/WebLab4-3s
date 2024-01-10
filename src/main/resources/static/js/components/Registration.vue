@@ -29,7 +29,9 @@
                       </small>
                     </div>
                     <button @click="submit" class="btn-auth" :disabled="!form.valid">Регистрация</button>
-                  <h6 class="text-reg">Зарегистрированы? <a @click="toLogin" class="link-reg" href="#">Войти</a></h6>
+                    <h6 class="text-reg">Зарегистрированы?
+                      <router-link to="/login" class="link-reg">Войти</router-link>
+                    </h6>
               </div>
           </div>
       </div>
@@ -38,8 +40,8 @@
 
 <script setup>
 import { ref } from "vue"
-import { useFormReg } from "use/formReg"
-import { useFetchPost } from "use/fetchPost"
+import { useFormReg } from "use/validForm/formReg"
+import { useFetchPost } from "use/requests/fetchPost"
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -63,10 +65,6 @@ const form = useFormReg({
     validators: {required, minLength: minLength(minPassLength)}
   }
 })
-
-function toLogin(){
-  router.push('/login')
-}
 
 const regErrText = ref('')
 const regErr = ref(false)

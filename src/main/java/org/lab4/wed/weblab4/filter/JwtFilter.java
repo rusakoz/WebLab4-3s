@@ -36,6 +36,7 @@ public class JwtFilter extends GenericFilterBean {
                 log.debug("Filter start");
         final String token = getTokenFromRequest((HttpServletRequest) request);
         if (token != null && jwtProvider().validateAccessToken(token)) {
+            log.debug("ok filter");
             final Claims claims = jwtProvider().getAccessClaims(token);
             final JwtAuthentication jwtInfoToken = JwtUtils.generate(claims);
             jwtInfoToken.setAuthenticated(true);

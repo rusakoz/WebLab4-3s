@@ -1,11 +1,15 @@
-import { watch, ref } from "vue";
+import { watch } from "vue";
+import { useStore } from "vuex";
+
 
 export function useDraw(obj){
-    const radiusInPixel = 25;
-    const centerX = 151.5
-    const centerY = 151.5
-    const widthAxisY = 3
-    const heightAxisX = 3
+    const store = useStore()
+
+    const radiusInPixel = store.state.canvas.radiusInPixel;
+    const centerX = store.state.canvas.centerX
+    const centerY = store.state.canvas.centerY
+    const widthAxisY = store.state.canvas.widthAxisY
+    const heightAxisX = store.state.canvas.heightAxisX
 
     const ctx = obj.canvas.obj.getContext('2d');
     
@@ -27,17 +31,17 @@ export function useDraw(obj){
         //четверть круга
         ctx.beginPath()
         ctx.moveTo(centerX, centerY)
-        ctx.arc(centerX, centerY, radiusInPixel * radius, 0, Math.PI/2, false)
+        ctx.arc(centerX, centerY, radiusInPixel * radius, Math.PI/2, Math.PI, false)
         ctx.fillStyle = 'blue'
         ctx.fill()
     
         //квадрат
         ctx.beginPath()
-        ctx.fillRect(centerX - radiusInPixel/2 * radius, centerY, radiusInPixel/2 * radius, radiusInPixel * radius)
+        ctx.fillRect(centerX, centerY, radiusInPixel/2 * radius, radiusInPixel * radius)
     
         //треугольник
         ctx.moveTo(centerX, centerY - radiusInPixel * radius)
-        ctx.lineTo(centerX - radiusInPixel * radius, centerY)
+        ctx.lineTo(centerX + radiusInPixel * radius, centerY)
         ctx.lineTo(centerX, centerY)
         ctx.fill()
     

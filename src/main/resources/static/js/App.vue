@@ -1,37 +1,23 @@
 <template>
-  <Header v-if="is"/>
+  <Header v-if="isAuth"/>
 
   <router-view></router-view>
 
-  <!-- <Footer v-if="is"/> -->
+  <!-- <Footer v-if="isAuth"/> -->
   
 </template>
 
 <script setup>
-import { computed, onBeforeMount } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import Header from 'components/Header.vue'
 import Footer from 'components/Footer.vue'
+import { useGuardRouter } from 'router/guardRouter'
 
-const router = useRouter()
 const store = useStore()
+const isAuth = computed(()=>store.state.isAuth)
 
-const is = computed(() => store.state.isAuth)
-
-router.beforeEach(async (to, from) => {
-  store.commit('setAuthValue', localStorage.getItem('isLoggin'))
-  
-  // Если не авторизован пользователь, то открыт доступ к /login и /registration
-  if (!is.value && to.name !== 'Login' && to.name !== 'Registration') {
-    return { name: 'Login' }
-  }
-  //Если пользователь авторизован, то доступ к /login и /registration закрыт
-  if(is.value && (to.name === 'Registration' || to.name === 'Login')){
-    return { from }
-  }
-
-})
+useGuardRouter()
 
 </script>
 

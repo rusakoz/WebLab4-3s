@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import App from 'App.vue'
 import Login from 'components/Login.vue'
 import Registration from 'components/Registration.vue'
 import Graph from 'components/mainContents/Graph.vue'

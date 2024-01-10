@@ -2,7 +2,7 @@
    <div class="main">
         <div class="alert">
             <h3>Время авторизации вышло, повторите авторизацию</h3>
-            <button @click="redirectToAuth" class="button">Окей</button>
+            <button @click="router.replace('/login')" class="button">Окей</button>
         </div>
    </div> 
 </template>
@@ -11,10 +11,6 @@
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
-function redirectToAuth(){
-    router.replace('/login')
-}
 
 </script>
 

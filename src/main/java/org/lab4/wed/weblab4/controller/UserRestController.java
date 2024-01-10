@@ -48,7 +48,7 @@ public class UserRestController {
         return ResponseEntity.ok(token);
     }
 
-    @PostMapping("token")
+    @PostMapping(value = "token")
     public ResponseEntity<?> getNewAccessToken(@RequestBody RefreshJwtRequest request) {
         JwtResponse token;
         try {
@@ -60,7 +60,7 @@ public class UserRestController {
     }
 
     @SecurityRequirement(name = "Bearer Authorization")
-    @PostMapping("refresh")
+    @PostMapping(value = "refresh", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getNewRefreshToken(@RequestBody RefreshJwtRequest request) {
         JwtResponse tokens;
         try {

@@ -7,12 +7,12 @@ import org.lab4.wed.weblab4.db.dto.ResultsReadDto;
 import org.lab4.wed.weblab4.db.service.AuthJwtService;
 import org.lab4.wed.weblab4.db.service.ResultService;
 import org.lab4.wed.weblab4.jwt.JwtAuthentication;
+import org.lab4.wed.weblab4.model.ValidatorCoords;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,15 +44,19 @@ public class ResultsRestController {
     }
 
     @SecurityRequirement(name = "Bearer Authorization")
-    @PostMapping("save")
+    @PostMapping(value = "save", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> saveResult(@RequestBody ResultsCreateEditDto resultsDto) {
         log.info("check results");
         final JwtAuthentication authInfo = authJwtService.getAuthInfo();
 
+        if (!ValidatorCoords.validate(resultsDto.getX(), resultsDto.getY(), resultsDto.getR())) {
+            return new ResponseEntity<>("{\"error\":\""+ "Невалидные данные" +"\"}", HttpStatus.BAD_REQUEST);
+        }
+
         resultsDto.setUserId(authInfo.getUserId());
 
-        resultService.createNew(resultsDto);
+        final ResultsReadDto readDto = resultService.checkHitAndCreateNew(resultsDto);
         
-        return new ResponseEntity<>("{\"status\":\""+ "Created" +"\"}", HttpStatus.CREATED);
+        return new ResponseEntity<>(readDto, HttpStatus.CREATED);
     }
 }

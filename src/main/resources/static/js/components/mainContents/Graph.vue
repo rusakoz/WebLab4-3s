@@ -4,13 +4,12 @@
             <div class="container">
                 <div class="content">
                     <div class="canvas-and-form">
-                        <!-- <pre>{{form}}</pre> -->
                         <div class="canvas">
-                            <canvas id="canvas" height="325px" width="325px"></canvas>
+                            <canvas @click="cl" id="canvas" height="325px" width="325px"></canvas>
                         </div>
 
                         <div class="form">
-
+                            <small v-if="errSubmit.status.value" class="errors">{{ errSubmit.text.value }}</small>
                             <div class="form-control" :class="{invalid: !form.coordX.valid && form.coordX.touched}">
                                 <span> Координата X: </span>
 
@@ -63,7 +62,7 @@
                                     Радиус не может быть отрицательным
                                 </small>
                             </div>
-                            <button @click="submit" class="btn-auth" :disabled="!form.valid || !radiusCanvas.valid">Войти</button>
+                            <button @click="submitButton" class="btn-auth" :disabled="!form.valid || !radiusCanvas.valid">Войти</button>
                         </div>
                     </div>
                     <div class="table-wrapper">
@@ -73,17 +72,16 @@
                                 <table id="result-table">
                                     <thead>
                                         <tr>
-                                            <td>X</td>
-                                            <td>Y</td>
-                                            <td>R</td>
-                                            <td>Hit</td>
-                                            <td>Date</td>
-                                            <td>ExecTime</td>
+                                            <th>X</th>
+                                            <th>Y</th>
+                                            <th>R</th>
+                                            <th>Hit</th>
+                                            <th>Date</th>
+                                            <th>ExecTime</th>
                                         </tr>
                                     </thead>
-                                    <small v-if="loadErr" class="errors" id="errMsg">{{ loadErrText }}</small>
                                     <tbody>
-                                        <tr v-for="(iterObject) in tableData">
+                                        <tr v-for="(iterObject) in tableData.data">
                                             <td>{{iterObject.x}}</td>
                                             <td>{{iterObject.y}}</td>
                                             <td>{{iterObject.r}}</td>
@@ -93,6 +91,8 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                <small v-if="tableData.error.loadErr" class="errors" id="errMsg">{{ tableData.error.loadErrText }}</small>
+                                <small v-else-if="tableData.status.now">{{ tableData.status.now }}</small>
                             </div>
                         </div>
                     </div>
@@ -104,10 +104,23 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
-import { useDraw } from 'use/draw'
-import { useForm } from 'use/form'
-import { useGetTableData } from 'use/getTableData'
-import { useRefreshAccessToken } from 'use/refreshAccessToken'
+import { useDraw } from 'use/graph/draw'
+import { useForm } from 'use/validForm/form'
+import { useLoadTable } from 'use/graph/loadTable'
+import { useFetchPostJwt } from 'use/requests/fetchPostJwt'
+import { useRefreshAccessToken } from 'use/jwtManager/refreshAccessToken'
+import { useForcedLogout } from 'use/router/forcedLogout'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+import { useConvertCoord } from 'use/graph/convertCoord'
+
+function cl(event){
+    const coords = useConvertCoord(event, store)
+    request(coords.x, coords.y, radiusCanvas.radius.value)
+}
+
+const router = useRouter()
+const store = useStore()
 
 const required = val => !!val
 const minVal = num => val => val >= num // minVal(3)(2) minVal(3)(4)
@@ -135,87 +148,114 @@ const radiusCanvas = useForm({
     }
 })
 
-const tableData = reactive([{
+const tableData = reactive({
+    data: [{
     x: '',
     y: '',
     r: '',
     hit: '',
     date: '',
     execTime: ''
-}])
+    }],
+    status: {
+        now: 'loading...'
+    },
+    error: {
+        loadErrText: '',
+        loadErr: false
+    }
+})
 
-const loadErrText = ref('')
-const loadErr = ref(false)
+const errSubmit = reactive({
+    status: false,
+    text: ''
+})
 
-async function loadTable(){
-    function fetch(){
-        return useGetTableData('/result/get', 
-                        {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + localStorage.getItem('userAccessToken')
-                        })
-                        .catch(()=>{
-                            loadErrText.value = 'Ошибка загрузки данных'
-                            loadErr.value = true
-                        })
+function submitButton(){
+    request(form.coordX.value, form.coordY.value, radiusCanvas.radius.value)
+}
+
+async function request(x, y, r){
+    function request(){
+        return useFetchPostJwt('/result/save', {
+                                                x: x,
+                                                y: y,
+                                                r: r,
+                                                })
     }
 
-    const response = await fetch()
-    
-    if(response.status === 401){
-        if(useRefreshAccessToken(localStorage.getItem('userRefreshToken'))){
-            const response = await fetch()
-                    .catch(()=>{
-                            loadErrText.value = 'Ошибка загрузки данных'
-                            loadErr.value = true
-                            })
-            if(response.status === 200){
-                fillTable(response)
-            }else{
-                loadErrText.value = 'Ошибка загрузки данных'
-                loadErr.value = true
-            }
-        }else{
-            localStorage.removeItem('userAccessToken', res.accessToken)
-            localStorage.removeItem('userRefreshToken', res.refreshToken)
-            localStorage.setItem('isLoggin', false)
-            alert('Время авторизации вышло, авторизуйтесь заново')
-        }
-    }
-    else if(response.status === 200){
-        fillTable(response)
-    }
-    else{
-        loadErrText.value = 'Ошибка загрузки данных'
-        loadErr.value = true
-    }
+    const response = await request().catch(()=>{ setErr() })
 
-    function fillTable(response){
+    if(response.status === 201){
         const data = response.json()
 
-        data.then((a)=>{
-            for (const [key, value] of Object.entries(a)) {
-                const date = new Date(Date.parse(value.date))
-                tableData.push({
-                                x: value.x,
-                                y: value.y,
-                                r: value.r,
-                                hit: value.hit,
-                                date: date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
-                                execTime: value.execTime
-                            })
+         data.then((data)=>{
+            const date = new Date(Date.parse(data.date))
+            tableData.data.push({
+            x: data.x,
+            y: data.y,
+            r: data.r,
+            hit: data.hit ? 'Попал' : 'Не попал',
+            date: date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
+            execTime: data.execTime + 'мс'
+            })
+        }) 
+
+    }else if(response.status === 400){
+        const data = response.json()
+
+        data.then((error)=>{errSubmit.status = true; errSubmit.text = error.error})
+    }else if(response.status === 401){
+        let isRefresh = false
+        await useRefreshAccessToken().then((status)=>{isRefresh = status})
+
+        if(isRefresh){
+            const response = await request().catch(()=>{ setErr() })
+
+            if(response.status === 201){
+                const data = response.json()
                 
-                console.log(key, value, tableData, tableData.length)
+                let errText
+                await data.then((data)=>{errSubmit.status = true
+                                        errSubmit.text = data.error
+                                        })
+
+                if(typeof errText === 'undefined'){
+                    data.then((data)=>{
+                    const date = new Date(Date.parse(data.date))
+                    tableData.data.push({
+                    x: data.x,
+                    y: data.y,
+                    r: data.r,
+                    hit: data.hit ? 'Попал' : 'Не попал',
+                    date: date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
+                    execTime: data.execTime + 'мс'
+                    })
+                }) 
+                }else{
+                    useForcedLogout(store, router)
+                }
+            }else if(response.status === 401){
+                useForcedLogout(store, router)
             }
-            if(tableData.length >= 1) tableData.pop
-        })
+            else{
+                setErr()
+            }
+        }else{
+            useForcedLogout(store, router)
+        }
+    }
+    else{
+        setErr()
+    }
+
+    function setErr(){
+        errSubmit.status = true
+        errSubmit.text = 'Ошибка отправки данных'
     }
 }
 
-loadTable()
-
-
+useLoadTable(tableData).then((res)=>{tableData.value = res})
 
 onMounted(function(){
     radiusCanvas.canvas.obj = document.getElementById('canvas')
@@ -242,5 +282,23 @@ onMounted(function(){
     color: #212529;
     background-color: #848688;
   }
+
+  table {
+    width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  }
+
+  thead th {
+  font-size: 15px;
+  font-weight: bold;
+  color: #2e2b2b;
+  border-left: 2px solid #D0E4F5;
+}
+
+ td, th {
+  border: 1px solid #AAAAAA;
+  padding: 3px 2px;
+}
 
 </style>

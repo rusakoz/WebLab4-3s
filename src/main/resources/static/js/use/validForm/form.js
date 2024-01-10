@@ -1,5 +1,5 @@
 import { computed, reactive } from "vue";
-import { useField } from "./field";
+import { useField } from "use/validForm/field";
 
 export function useForm(init = {}){
   const form = reactive({})
@@ -11,10 +11,7 @@ export function useForm(init = {}){
   const withoutValid = val => val !== 'valid'
   
   form.valid = computed(()=>{
-    return Object.keys(form).filter(withoutValid).reduce((acc, k) =>{
-        acc = form[k].valid
-        return acc
-    }, true)
+    return Object.keys(form).filter(withoutValid).every(k => form[k].valid)
   })
 
   return form
