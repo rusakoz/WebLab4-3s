@@ -9,7 +9,8 @@
                         </div>
 
                         <div class="form">
-                            <small v-if="errSubmit.status.value" class="errors">{{ errSubmit.text.value }}</small>
+                            <small v-if="submitInfo.status === 'err'" class="errors">{{ submitInfo.text }}</small>
+                            <small v-else-if="submitInfo.status === 'sending'" class="errors">{{ submitInfo.text }}</small>
                             <div class="form-control" :class="{invalid: !form.coordX.valid && form.coordX.touched}">
                                 <span> Координата X: </span>
 
@@ -62,7 +63,7 @@
                                     Радиус не может быть отрицательным
                                 </small>
                             </div>
-                            <button @click="submitButton" class="btn-auth" :disabled="!form.valid || !radiusCanvas.valid">Войти</button>
+                            <button @click="submitButton" class="btn-auth" :disabled="!form.valid || !radiusCanvas.valid">Отправить</button>
                         </div>
                     </div>
                     <div class="table-wrapper">
@@ -166,8 +167,8 @@ const tableData = reactive({
     }
 })
 
-const errSubmit = reactive({
-    status: false,
+const submitInfo = reactive({
+    status: '',
     text: ''
 })
 
@@ -176,6 +177,8 @@ function submitButton(){
 }
 
 async function request(x, y, r){
+    submitInfo.status = 'sending'
+    submitInfo.text = 'Отправка данных...'
     function request(){
         return useFetchPostJwt('/result/save', {
                                                 x: x,
@@ -221,6 +224,9 @@ async function request(x, y, r){
                                         })
 
                 if(typeof errText === 'undefined'){
+                    submitInfo.status = ''
+                    submitInfo.text = ''
+
                     data.then((data)=>{
                     const date = new Date(Date.parse(data.date))
                     tableData.data.push({
@@ -250,8 +256,8 @@ async function request(x, y, r){
     }
 
     function setErr(){
-        errSubmit.status = true
-        errSubmit.text = 'Ошибка отправки данных'
+        submitInfo.status = 'err'
+        submitInfo.text = 'Ошибка отправки данных'
     }
 }
 

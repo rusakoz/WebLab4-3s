@@ -84,7 +84,6 @@ export async function useLoadTable(init = {}){
     else{
         tableData.error = errObj
     }
-    console.log(tableData.data, tableData.error)
 
     tableData.status.now = ''
     return tableData

@@ -13,7 +13,6 @@ export function useConvertCoord(event, store){
 
     const x = convertPixelToCoordX(event.offsetX, radiusInPixel)
     const y = convertPixelToCoordY(event.offsetY, radiusInPixel)
-    console.log(x, y)
-    return {x, y}
 
+    return {x, y}
 }
