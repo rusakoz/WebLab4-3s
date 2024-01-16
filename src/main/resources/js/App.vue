@@ -3,7 +3,7 @@
 
   <router-view></router-view>
 
-  <!-- <Footer v-if="isAuth"/> -->
+  <Footer v-if="isAuth"/>
   
 </template>
 
@@ -20,4 +20,9 @@ const isAuth = computed(()=>store.state.isAuth)
 useGuardRouter()
 
 </script>
+
+<style>
+
+
+</style>
 

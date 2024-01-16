@@ -1,7 +1,3 @@
-<script setup>
-
-</script>
-
 <template>
     <div class="footer">
         <div class="container">
@@ -10,17 +6,17 @@
                 <ul class="social">
                     <li class="social-item">
                         <a href="#" class="footer-btn-img">
-                            <img src="/images/tg.svg" alt="" class="footer-img"/>
+                            <DsSvg />
                         </a>
                     </li>
                     <li class="social-item">
                         <a href="https://vk.com/iruslani" class="footer-btn-img">
-                            <img src="/images/vk.svg" alt="" class="footer-img"/>
+                            <VkSvg />
                         </a>
                     </li>
                     <li class="social-item">
                         <a href="#" class="footer-btn-img">
-                            <img src="/images/ds.svg" alt="" class="footer-img"/>
+                            <TgSvg />
                         </a>
                     </li>
                 </ul>
@@ -28,4 +24,10 @@
         </div>
     </div>
 </template>
+
+<script setup>
+import DsSvg from 'components/imagesSvg/Ds.vue'
+import TgSvg from 'components/imagesSvg/Tg.vue'
+import VkSvg from 'components/imagesSvg/Vk.vue'
+</script>
 

@@ -11,7 +11,7 @@
                         <div class="form">
                             <small v-if="submitInfo.status === 'err'" class="errors">{{ submitInfo.text }}</small>
                             <small v-else-if="submitInfo.status === 'sending'" class="errors">{{ submitInfo.text }}</small>
-                            <div class="form-control" :class="{invalid: !form.coordX.valid && form.coordX.touched}">
+                            <div class="form-control" :class="{ invalid: !form.coordX.valid && form.coordX.touched }">
                                 <span> Координата X: </span>
 
                                 <select v-model="form.coordX.value" @blur="form.coordX.blur">
@@ -30,21 +30,26 @@
                                     Выберите координату
                                 </small>
                             </div>
-                            
-                            <div class="form-control" :class="{invalid: !form.coordY.valid && form.coordY.touched}">
+
+                            <div class="form-control" :class="{ invalid: !form.coordY.valid && form.coordY.touched }">
                                 <span> Координата Y: </span>
 
                                 <input v-model="form.coordY.value" @blur="form.coordY.blur">
 
-                                <small v-if="(form.coordY.errors.isNum || form.coordY.errors.required) && form.coordY.touched" class="errors">
+                                <small
+                                    v-if="(form.coordY.errors.isNum || form.coordY.errors.required) && form.coordY.touched"
+                                    class="errors">
                                     Кордината должна быть числом
                                 </small>
-                                <small v-else-if="(form.coordY.errors.minVal || form.coordY.errors.maxVal) && form.coordY.touched" class="errors">
+                                <small
+                                    v-else-if="(form.coordY.errors.minVal || form.coordY.errors.maxVal) && form.coordY.touched"
+                                    class="errors">
                                     Допустимый диапозон [-3;3]
                                 </small>
                             </div>
 
-                            <div class="form-control" :class="{invalid: !radiusCanvas.radius.valid && radiusCanvas.radius.touched}">
+                            <div class="form-control"
+                                :class="{ invalid: !radiusCanvas.radius.valid && radiusCanvas.radius.touched }">
                                 <span> Радиус: </span>
 
                                 <select v-model="radiusCanvas.radius.value" @blur="radiusCanvas.radius.blur">
@@ -59,11 +64,13 @@
                                     <option>4</option>
                                     <option>5</option>
                                 </select>
-                                <small v-if="radiusCanvas.radius.errors.minVal && radiusCanvas.radius.touched" class="errors">
+                                <small v-if="radiusCanvas.radius.errors.minVal && radiusCanvas.radius.touched"
+                                    class="errors">
                                     Радиус не может быть отрицательным
                                 </small>
                             </div>
-                            <button @click="submitButton" class="btn-auth" :disabled="!form.valid || !radiusCanvas.valid">Отправить</button>
+                            <button @click="submitButton" class="btn-auth"
+                                :disabled="!form.valid || !radiusCanvas.valid">Отправить</button>
                         </div>
                     </div>
                     <div class="table-wrapper">
@@ -83,16 +90,17 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(iterObject) in tableData.data">
-                                            <td>{{iterObject.x}}</td>
-                                            <td>{{iterObject.y}}</td>
-                                            <td>{{iterObject.r}}</td>
-                                            <td>{{iterObject.hit}}</td>
-                                            <td>{{iterObject.date}}</td>
-                                            <td>{{iterObject.execTime}}</td>
+                                            <td>{{ iterObject.x }}</td>
+                                            <td>{{ iterObject.y }}</td>
+                                            <td>{{ iterObject.r }}</td>
+                                            <td>{{ iterObject.hit }}</td>
+                                            <td>{{ iterObject.date }}</td>
+                                            <td>{{ iterObject.execTime }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
-                                <small v-if="tableData.error.loadErr" class="errors" id="errMsg">{{ tableData.error.loadErrText }}</small>
+                                <small v-if="tableData.error.loadErr" class="errors" id="errMsg">{{
+                                    tableData.error.loadErrText }}</small>
                                 <small v-else-if="tableData.status.now">{{ tableData.status.now }}</small>
                             </div>
                         </div>
@@ -105,7 +113,7 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
-import { useDraw } from 'use/graph/draw'
+import { useWatchRadius } from 'use/graph/watchRadius'
 import { useForm } from 'use/validForm/form'
 import { useLoadTable } from 'use/graph/loadTable'
 import { useFetchPostJwt } from 'use/requests/fetchPostJwt'
@@ -114,8 +122,9 @@ import { useForcedLogout } from 'use/router/forcedLogout'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { useConvertCoord } from 'use/graph/convertCoord'
+import { usePrintPointFromTable } from 'use/graph/printPointFromTable'
 
-function cl(event){
+function cl(event) {
     const coords = useConvertCoord(event, store)
     request(coords.x, coords.y, radiusCanvas.radius.value)
 }
@@ -131,32 +140,32 @@ const isNum = val => !isNaN(val)
 const form = useForm({
     coordX: {
         value: '',
-        validators: {required}
+        validators: { required }
     },
     coordY: {
         value: '',
-        validators: {required, minVal: minVal(-3), maxVal: maxVal(3), isNum}
+        validators: { required, minVal: minVal(-3), maxVal: maxVal(3), isNum }
     }
 })
 
 const radiusCanvas = useForm({
     radius: {
         value: 1,
-        validators: {minVal: minVal(0)}
+        validators: { minVal: minVal(0) }
     },
     canvas: {
-        obj: 1
+        obj: null
     }
 })
 
 const tableData = reactive({
     data: [{
-    x: '',
-    y: '',
-    r: '',
-    hit: '',
-    date: '',
-    execTime: ''
+        x: '',
+        y: '',
+        r: '',
+        hit: '',
+        date: '',
+        execTime: ''
     }],
     status: {
         now: 'loading...'
@@ -172,139 +181,129 @@ const submitInfo = reactive({
     text: ''
 })
 
-function submitButton(){
+function submitButton() {
     request(form.coordX.value, form.coordY.value, radiusCanvas.radius.value)
 }
 
-async function request(x, y, r){
+async function request(x, y, r) {
     submitInfo.status = 'sending'
     submitInfo.text = 'Отправка данных...'
-    function request(){
+    function request() {
         return useFetchPostJwt('/result/save', {
-                                                x: x,
-                                                y: y,
-                                                r: r,
-                                                })
+            x: x,
+            y: y,
+            r: r,
+        })
     }
 
-    const response = await request().catch(()=>{ setErr() })
+    const response = await request().catch(() => { setErr('Ошибка отправки данных') })
 
-    if(response.status === 201){
+    if (response.status === 201) {
+        submitInfoClear()
+        
+        const dataJson = response.json()
+        saveAndPrint(dataJson)
+
+    } else if (response.status === 400) {
         const data = response.json()
 
-         data.then((data)=>{
-            const date = new Date(Date.parse(data.date))
-            tableData.data.push({
-            x: data.x,
-            y: data.y,
-            r: data.r,
-            hit: data.hit ? 'Попал' : 'Не попал',
-            date: date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
-            execTime: data.execTime + 'мс'
-            })
-        }) 
-
-    }else if(response.status === 400){
-        const data = response.json()
-
-        data.then((error)=>{errSubmit.status = true; errSubmit.text = error.error})
-    }else if(response.status === 401){
+        data.then((error) => { setErr(error.error) })
+    } else if (response.status === 401) {
         let isRefresh = false
-        await useRefreshAccessToken().then((status)=>{isRefresh = status})
+        await useRefreshAccessToken().then((status) => { isRefresh = status })
 
-        if(isRefresh){
-            const response = await request().catch(()=>{ setErr() })
+        if (isRefresh) {
+            const response = await request().catch(() => { setErr('Ошибка отправки данных') })
 
-            if(response.status === 201){
-                const data = response.json()
-                
-                let errText
-                await data.then((data)=>{errSubmit.status = true
-                                        errSubmit.text = data.error
-                                        })
+            if (response.status === 201) {
+                submitInfoClear()
 
-                if(typeof errText === 'undefined'){
-                    submitInfo.status = ''
-                    submitInfo.text = ''
+                const dataJson = response.json()
+                saveAndPrint(dataJson)
 
-                    data.then((data)=>{
-                    const date = new Date(Date.parse(data.date))
-                    tableData.data.push({
-                    x: data.x,
-                    y: data.y,
-                    r: data.r,
-                    hit: data.hit ? 'Попал' : 'Не попал',
-                    date: date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
-                    execTime: data.execTime + 'мс'
-                    })
-                }) 
-                }else{
-                    useForcedLogout(store, router)
-                }
-            }else if(response.status === 401){
+            } else if (response.status === 401) {
                 useForcedLogout(store, router)
             }
-            else{
-                setErr()
+            else {
+                setErr('Ошибка отправки данных')
             }
-        }else{
+        } else {
             useForcedLogout(store, router)
         }
     }
-    else{
-        setErr()
+    else {
+        setErr('Ошибка отправки данных')
     }
 
-    function setErr(){
+    function saveAndPrint(dataJson) {
+        dataJson.then((data) => {
+            const date = new Date(Date.parse(data.date))
+            tableData.data.push({
+                x: data.x,
+                y: data.y,
+                r: data.r,
+                hit: data.hit ? 'Попал' : 'Не попал',
+                date: date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
+                execTime: data.execTime + 'мс'
+            })
+            usePrintPointFromTable(document.getElementById('canvas'), data.x, data.y, data.r, data.hit ? 'red' : 'green', store)
+        })
+    }
+
+    function submitInfoClear() {
+        submitInfo.status = ''
+        submitInfo.text = ''
+    }
+
+    function setErr(errText) {
         submitInfo.status = 'err'
-        submitInfo.text = 'Ошибка отправки данных'
+        submitInfo.text = errText
     }
 }
 
-useLoadTable(tableData).then((res)=>{tableData.value = res})
+useLoadTable(tableData).then((res) => { tableData.value = res })
 
-onMounted(function(){
+onMounted(function () {
     radiusCanvas.canvas.obj = document.getElementById('canvas')
-    useDraw(radiusCanvas)
+    useWatchRadius(radiusCanvas)
 })
 
 </script>
 
 <style scoped>
-
-.form-control.invalid select{
+.form-control.invalid select {
     border: 2px solid;
     border-color: rgb(216, 0, 0);
-  }
+}
 
-  .errors{
+.errors {
     color: rgb(167, 27, 27);
     font-size: 13px;
     margin-left: 3px;
-  }
+}
 
-  .btn-auth:disabled{
+.btn-auth:disabled {
     cursor: default;
     color: #212529;
     background-color: #848688;
-  }
+}
 
-  table {
+table {
     width: 100%;
-  text-align: left;
-  border-collapse: collapse;
-  }
-
-  thead th {
-  font-size: 15px;
-  font-weight: bold;
-  color: #2e2b2b;
-  border-left: 2px solid #D0E4F5;
+    text-align: left;
+    border-collapse: collapse;
 }
 
- td, th {
-  border: 1px solid #AAAAAA;
-  padding: 3px 2px;
+thead th {
+    font-size: 15px;
+    font-weight: bold;
+    color: #2e2b2b;
+    border-left: 2px solid #D0E4F5;
 }
 
+td,
+th {
+    border: 1px solid #AAAAAA;
+    padding: 3px 2px;
+}
 </style>

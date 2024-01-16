@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/")
 public class MainController {
 
-    @Value("${spring.profile.active}")
+    @Value("${spring.profile.active:prod}")
     private String profile;
 
     @GetMapping

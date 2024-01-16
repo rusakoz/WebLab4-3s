@@ -51,7 +51,6 @@ body{
     cursor: pointer;
     position: relative;
     justify-self: end;
-    background: url(../images/home.svg) no-repeat scroll;
     padding-right: 10px;
     background-size: 16px 16px;
     border: none;

@@ -12,7 +12,6 @@ export async function useRefreshAccessToken(){
       await responseJson.then((res)=>{errorText = res.error})
 
       if(typeof errorText === 'undefined'){
-        console.log('все збс')
         responseJson.then((res)=>{
           localStorage.setItem('userAccessToken', res.accessToken)
         })
