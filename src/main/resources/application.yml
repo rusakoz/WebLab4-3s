@@ -7,7 +7,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/studs
     username: s338963
-    password: ${db-password}
+    password: ${db_password}
     driver-class-name: org.postgresql.Driver
   jpa:
     properties.hibernate:
