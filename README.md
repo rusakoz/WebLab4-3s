@@ -9,7 +9,7 @@ yarn build
 ./gradlew build
 ```
 
-## Запуск PROD на Unix/Linux:
+## Запуск PROD версии на Unix/Linux:
 1) Установка переменных окружения:
 ```
 export db_url='your_url';
