@@ -5,7 +5,7 @@
 ```
 yarn build
 ```
-2) Сборка BackEnd с файлом JS(пункт 2) в jar файл:
+2) Сборка BackEnd с файлом JS(пункт 1) в jar файл:
 ```
 ./gradlew build
 ```
