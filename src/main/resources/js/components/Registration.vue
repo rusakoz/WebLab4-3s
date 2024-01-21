@@ -115,21 +115,6 @@ async function submit(){
         align-items: center;
         min-height: 100vh;
     }
-  .login-container{
-    display: flex;
-    padding-left: 5px;
-    padding-right: 5px;
-    flex-direction: column;
-    width: calc(100vw/100*15);
-    height: calc(100vh/100*55);
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(180deg, rgb(220, 224, 222) 0%, rgba(142, 145, 144, 0.93) 100%);
-    margin-top: 25px;
-    border-radius: 1rem;
-    box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.5)
-    
-  }
 
   .name{
     height: 30px;
@@ -159,15 +144,6 @@ async function submit(){
     border-color: #bdbdbd;
     outline: 0;
     box-shadow: 0 0 0 0.1rem rgba(71, 71, 71, 0.25);
-  }
-
-  .btn-auth{
-    margin-top: 10px;
-    max-width: 100%;
-    border-radius: 1rem;
-    border: 0;
-    background-color: rgb(255, 255, 255);
-    color: rgb(0, 0, 0);
   }
 
   .btn-auth:hover{

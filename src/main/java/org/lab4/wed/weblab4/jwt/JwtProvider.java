@@ -29,8 +29,8 @@ public class JwtProvider {
 
     public JwtProvider()
     {
-        this.jwtAccessSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(System.getenv("jwt.secret.access")));
-        this.jwtRefreshSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(System.getenv("jwt.secret.refresh")));
+        this.jwtAccessSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(System.getenv("jwt_secret_access")));
+        this.jwtRefreshSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(System.getenv("jwt_secret_refresh")));
     }
 
     public String generateAccessToken(@NonNull UserReadDto user) {

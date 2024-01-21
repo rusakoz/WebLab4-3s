@@ -12,11 +12,13 @@ import org.lab4.wed.weblab4.mapper.ResultsCreateEditMapper;
 import org.lab4.wed.weblab4.mapper.ResultsReadMapper;
 import org.lab4.wed.weblab4.model.CheckHit;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ResultService {
     
     private final ResultRepository repository;
@@ -33,6 +35,7 @@ public class ResultService {
                     .toList();
     }
 
+    @Transactional
     public ResultsReadDto create(ResultsCreateEditDto resultsDto){
         return Optional.of(resultsDto)
             .map(resultsCreateEditMapper::map)
@@ -41,7 +44,7 @@ public class ResultService {
             .orElseThrow();
     }
 
-
+    @Transactional
     public ResultsReadDto checkHitAndCreateNew(ResultsCreateEditDto resultsDto){
         final long startCheck = System.nanoTime();
         final boolean hit = CheckHit.checkHit(resultsDto.getX(), resultsDto.getY(), resultsDto.getR());

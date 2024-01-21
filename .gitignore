@@ -40,7 +40,7 @@ out/
 /node_modules
 
 ### Prod vers forntend ###
-/src/main/resources/static/js/
+/src/main/resources/static/js/**
 
 ### log ###
 .log

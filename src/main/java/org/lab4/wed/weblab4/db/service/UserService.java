@@ -10,11 +10,13 @@ import org.lab4.wed.weblab4.mapper.UserCreateEditMapper;
 import org.lab4.wed.weblab4.mapper.UserReadMapper;
 import org.lab4.wed.weblab4.security.BcryptEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository repository;
@@ -33,6 +35,7 @@ public class UserService {
         return repository.existsByName(name);
     }
 
+    @Transactional
     public UserReadDto create(UserCreateEditDto userDto){
         return Optional.of(userDto)
             .map(userCreateEditMapper::map)
@@ -41,6 +44,7 @@ public class UserService {
             .orElseThrow();
     }
 
+    @Transactional
     public UserReadDto registration(UserCreateEditDto userDto){
         userDto.setPassword(BcryptEncoder.encode(userDto.getPassword()));
         userDto.setDateOfCreation(LocalDate.now());
