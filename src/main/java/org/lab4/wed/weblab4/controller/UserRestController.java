@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-
-@Slf4j
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -38,7 +35,6 @@ public class UserRestController {
 
     @PostMapping(value = "login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody JwtRequest authRequest) {
-        log.info("check login");
         JwtResponse token;
         try {
             token = authJwtService.login(authRequest);

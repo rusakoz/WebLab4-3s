@@ -20,8 +20,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-// @Component фильтр именованный компонентом Spring будет считаться "глобальным" фильтром 
-// и всегда добавлять в цепочку фильтров, что не всегда нужно, как в этом приложении
 @NoArgsConstructor
 public class JwtFilter extends GenericFilterBean {
     private static final String AUTHORIZATION = "Authorization";
