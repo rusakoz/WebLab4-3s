@@ -19,9 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RestController
 @RequestMapping("/result")
 @RequiredArgsConstructor
@@ -32,7 +30,6 @@ public class ResultsRestController {
     @SecurityRequirement(name = "Bearer Authorization")
     @GetMapping("get")
     public ResponseEntity<?> getResults() {
-        log.info("check results");
         final JwtAuthentication authInfo = authJwtService.getAuthInfo();
 
         final List<ResultsReadDto> list = resultService.findByUserId(authInfo.getUserId());
@@ -46,7 +43,6 @@ public class ResultsRestController {
     @SecurityRequirement(name = "Bearer Authorization")
     @PostMapping(value = "save", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> saveResult(@RequestBody ResultsCreateEditDto resultsDto) {
-        log.info("check results");
         final JwtAuthentication authInfo = authJwtService.getAuthInfo();
 
         if (!ValidatorCoords.validate(resultsDto.getX(), resultsDto.getY(), resultsDto.getR())) {
