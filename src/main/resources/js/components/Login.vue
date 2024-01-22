@@ -1,7 +1,7 @@
 <template>
-  <div class="main-container">
-    <div class="container">
-      <div class="wrapper-container">
+  <div class="auth-main-container">
+    <div class="auth-container">
+      <div class="auth-wrapper-container">
         <div class="login-container">
           <!-- <pre>{{ form }}</pre> -->
           <small v-if="authErr" class="errors">{{ authErrText }}</small>

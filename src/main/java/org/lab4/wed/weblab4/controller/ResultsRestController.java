@@ -1,6 +1,8 @@
 package org.lab4.wed.weblab4.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.lab4.wed.weblab4.db.dto.ResultsCreateEditDto;
 import org.lab4.wed.weblab4.db.dto.ResultsReadDto;
@@ -34,7 +36,9 @@ public class ResultsRestController {
 
         final List<ResultsReadDto> list = resultService.findByUserId(authInfo.getUserId());
         if (list.isEmpty()) {
-            return new ResponseEntity<>("{\"error\":\""+ "Записи не найдены" +"\"}", HttpStatus.OK);
+            Map<String, String> message = new HashMap<>();
+            message.put("error", "Записи не найдены");
+            return new ResponseEntity<>(message, HttpStatus.OK);
         }
 
         return new ResponseEntity<>(list, HttpStatus.OK);
@@ -46,13 +50,15 @@ public class ResultsRestController {
         final JwtAuthentication authInfo = authJwtService.getAuthInfo();
 
         if (!ValidatorCoords.validate(resultsDto.getX(), resultsDto.getY(), resultsDto.getR())) {
-            return new ResponseEntity<>("{\"error\":\""+ "Невалидные данные" +"\"}", HttpStatus.BAD_REQUEST);
+            Map<String, String> message = new HashMap<>();
+            message.put("error", "Невалидные данные");
+            return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
         }
 
         resultsDto.setUserId(authInfo.getUserId());
 
         final ResultsReadDto readDto = resultService.checkHitAndCreateNew(resultsDto);
-        
+
         return new ResponseEntity<>(readDto, HttpStatus.CREATED);
     }
 }

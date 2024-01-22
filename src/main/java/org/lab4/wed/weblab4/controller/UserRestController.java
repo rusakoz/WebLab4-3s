@@ -1,5 +1,8 @@
 package org.lab4.wed.weblab4.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.lab4.wed.weblab4.db.dto.UserCreateEditDto;
 import org.lab4.wed.weblab4.db.service.AuthJwtService;
 import org.lab4.wed.weblab4.db.service.UserService;
@@ -24,13 +27,16 @@ public class UserRestController {
 
     @PostMapping(value = "/reg", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registration(@RequestBody UserCreateEditDto userDto) {
+        Map<String, String> message = new HashMap<>();
         if (userService.existsByName(userDto.getName())) {
-            return new ResponseEntity<>("{\"error\":\""+ "Имя занято" +"\"}", HttpStatus.OK);
+            message.put("error", "Имя занято");
+            return new ResponseEntity<>(message, HttpStatus.OK);
         }
         
         userService.registration(userDto);
-
-        return new ResponseEntity<>("{\"status\":\""+ "Created" +"\"}", HttpStatus.CREATED);
+        
+        message.put("status", "Created");
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
     @PostMapping(value = "login", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -39,7 +45,9 @@ public class UserRestController {
         try {
             token = authJwtService.login(authRequest);
         } catch (AuthException e) {
-            return new ResponseEntity<>("{\"error\":\""+ e.getMessage() +"\"}", HttpStatus.OK);
+            Map<String, String> message = new HashMap<>();
+            message.put("error", e.getMessage());
+            return new ResponseEntity<>(message, HttpStatus.OK);
         }
         return ResponseEntity.ok(token);
     }
@@ -50,7 +58,9 @@ public class UserRestController {
         try {
             token = authJwtService.getAccessToken(request.getRefreshToken());
         } catch (AuthException e) {
-            return new ResponseEntity<>("{\"error\":\""+ e.getMessage() +"\"}", HttpStatus.OK);
+            Map<String, String> message = new HashMap<>();
+            message.put("error", e.getMessage());
+            return new ResponseEntity<>(message, HttpStatus.OK);
         }
         return ResponseEntity.ok(token);
     }
@@ -62,7 +72,9 @@ public class UserRestController {
         try {
             tokens = authJwtService.refresh(request.getRefreshToken());
         } catch (AuthException e) {
-            return new ResponseEntity<>("{\"error\":\""+ e.getMessage() +"\"}", HttpStatus.OK);
+            Map<String, String> message = new HashMap<>();
+            message.put("error", e.getMessage());
+            return new ResponseEntity<>(message, HttpStatus.OK);
         }
         return ResponseEntity.ok(tokens);
     }
