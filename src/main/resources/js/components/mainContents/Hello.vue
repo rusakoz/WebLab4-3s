@@ -13,7 +13,3 @@
 import Clock from 'components/mainContents/Clock.vue'
 
 </script>
-
-<style scoped>
-
-</style>

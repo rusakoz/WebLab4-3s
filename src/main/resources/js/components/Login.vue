@@ -3,7 +3,6 @@
     <div class="auth-container">
       <div class="auth-wrapper-container">
         <div class="login-container">
-          <!-- <pre>{{ form }}</pre> -->
           <small v-if="authErr" class="errors">{{ authErrText }}</small>
           <div class="form-control" :class="{ invalid: !form.name.valid && form.name.touched }">
             <label>Имя</label>
@@ -93,7 +92,3 @@ async function submit() {
 }
 
 </script>
-
-<style scoped>
-
-</style>

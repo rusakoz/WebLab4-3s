@@ -18,7 +18,3 @@ onBeforeMount(function (){
 })
 
 </script>
-
-<style scoped>
-
-</style>

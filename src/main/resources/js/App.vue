@@ -20,8 +20,3 @@ const isAuth = computed(()=>store.state.isAuth)
 useGuardRouter()
 
 </script>
-
-<style>
-
-</style>
-
