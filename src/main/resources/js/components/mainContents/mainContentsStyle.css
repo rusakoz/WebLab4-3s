@@ -1,0 +1,124 @@
+/* Grapg component */
+.content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    padding-top: 20px;
+    padding-bottom: 60px;
+}
+
+#result-table {
+    background-color: whitesmoke;
+    color: black;
+    max-height: 400px;
+    justify-self: end;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    text-align: center;
+}
+
+#result-table td {
+    width: 16.6%;
+}
+
+#clearButton {
+    width: 100%;
+    background: linear-gradient(180deg, darkmagenta 0%, rgba(80, 0, 250, 0.93) 100%);
+    cursor: pointer;
+    color: #cacad6;
+}
+
+#canvas {
+    border: 1px solid rgb(102, 100, 100);
+}
+/* Grapg component */
+
+
+/* Hello component */
+.title {
+    margin-top: 0;
+    padding-top: 15%;
+    font-size: 46px;
+    margin-bottom: 10px;
+    font-weight: 400;
+}
+
+.subtitle {
+    font-size: 25px;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.top-text {
+    font-size: 14px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-left: 1px;
+}
+/* Hello component */
+
+
+/* Clock component */
+#clock {
+    font-size: 16px;
+    color: #5c5c5e;
+    background-color: rgb(236, 236, 236);
+    padding: 20px 55px;
+    max-height: 60px;
+    max-width: 260px;
+}
+
+.main-btn {
+    cursor: pointer;
+    border: none;
+    background: linear-gradient(180deg, darkmagenta 0%, rgba(80, 0, 250, 0.93) 100%);
+    display: flex;
+    text-transform: uppercase;
+    padding: 1px;
+    color: #d9dbe3;
+    font-size: 16px;
+}
+
+.link-text {
+    text-align: center;
+    padding: 20px 110px;
+}
+/* Clock component */
+
+
+@media (max-width: 799px) {
+    .content {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .table-wrapper {
+        padding-top: 20px;
+    }
+}
+
+@media (max-width: 705px) {
+    .link-text {
+        padding: 10px 60px;
+
+    }
+
+    #clock {
+        padding: 10px 30px;
+    }
+}
+
+@media (max-width: 424px) {
+    .title {
+        font-size: 36px;
+    }
+
+    .main-btn {
+        flex-direction: column;
+    }
+
+    .link-text {
+        padding: 10px 68px;
+
+    }
+}
+
