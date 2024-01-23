@@ -42,8 +42,8 @@ const required = val => !!val
 const minLength = num => val => val.length >= num
 const minPassLength = 6
 
-let authErr = ref(false)
-let authErrText = ref('')
+const authErr = ref(false)
+const authErrText = ref('')
 
 const form = useForm({
   name: {
@@ -58,35 +58,34 @@ const form = useForm({
 
 async function submit() {
 
-  const response = await useFetchPost("/user/login", {
-    userLogin: form.name.value,
-    userPassword: form.password.value
-  }
-  ).catch(() => {
-    authErrText.value = "Ошибка авторизации"
+  const response = await useFetchPost("/user/login",
+                                                  {
+                                                    userLogin: form.name.value,
+                                                    userPassword: form.password.value
+                                                  }
+  ).catch((err) => {
+    authErrText.value = "Ошибка авторизации(" + err + ")"
     authErr.value = true
   })
 
   if (response.status === 200) {
-    const resJson = response.json()
+    const resJson = await response.json()
 
-    let errorText
-    await resJson.then((res) => { errorText = res.error })
+    const hasError = Boolean(resJson.error)
 
-    if (typeof errorText !== 'undefined') {
-      authErrText.value = errorText
+    if (hasError) {
+      authErrText.value = resJson.error
       authErr.value = true
     } else {
-      resJson.then((res) => {
-        localStorage.setItem('userAccessToken', res.accessToken)
-        localStorage.setItem('userRefreshToken', res.refreshToken)
-        localStorage.setItem('isLoggin', true)
-        store.commit('setAuthValue', true)
-      })
+      localStorage.setItem('userAccessToken', resJson.accessToken)
+      localStorage.setItem('userRefreshToken', resJson.refreshToken)
+      localStorage.setItem('isLoggin', true)
+      store.commit('setAuthValue', true)
+
       router.replace('/hello')
     }
   } else {
-    authErrText.value = "Ошибка авторизации"
+    authErrText.value = "Ошибка авторизации(Статус: " + response.status + ")"
     authErr.value = true
   }
 }
