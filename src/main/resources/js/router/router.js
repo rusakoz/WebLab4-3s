@@ -11,7 +11,7 @@ const routes = [
     { path: '/registration', name: 'Registration', component: Registration },
     { path: '/graph', component: Graph },
     { path: '/hello', component: Hello },
-    { path: '/authAlert', component: AuthAlert },
+    { path: '/authAlert', name: 'AuthAlert', component: AuthAlert },
 ]
 
 export default createRouter({

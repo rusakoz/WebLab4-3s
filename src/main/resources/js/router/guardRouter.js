@@ -9,16 +9,16 @@ export function useGuardRouter(){
     const isAuth = computed(()=>store.state.isAuth)
 
     router.beforeEach(async (to, from) => {
-    store.commit('setAuthValue', localStorage.getItem('isLoggin'))
+      store.commit('setAuthValue', localStorage.getItem('isLoggin'))
 
-    // Если не авторизован пользователь, то открыт доступ к /login и /registration
-    if (!isAuth.value && to.name !== 'Login' && to.name !== 'Registration') {
-      return { name: 'Login' }
-    }
-    //Если пользователь авторизован, то доступ к /login и /registration закрыт
-    if(isAuth.value && (to.name === 'Registration' || to.name === 'Login')){
-      return { from }
-    }
-  
-  })
+      // Если не авторизован пользователь, то открыт доступ к /login и /registration и /authAlert(для принудительного разлогина)
+      if (!isAuth.value && to.name !== 'Login' && to.name !== 'Registration' && to.name !== 'AuthAlert') {
+        return { name: 'Login' }
+      }
+      //Если пользователь авторизован, то доступ к /login и /registration закрыт
+      if(isAuth.value && (to.name === 'Registration' || to.name === 'Login')){
+        return { from }
+      }
+    
+    })
 }
