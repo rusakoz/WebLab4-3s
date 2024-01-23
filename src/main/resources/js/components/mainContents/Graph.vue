@@ -186,42 +186,44 @@ function submitButton() {
 }
 
 async function request(x, y, r) {
+    const ENTITY_CREATED_CODE = 201
+    const UNAUTHORIZED_CODE = 401
+    const BAD_REQUEST_CODE = 400
+
     submitInfo.status = 'sending'
     submitInfo.text = 'Отправка данных...'
     function request() {
-        return useFetchPostJwt('/result/save', {
-            x: x,
-            y: y,
-            r: r,
-        })
+        return useFetchPostJwt('/result/save', localStorage.getItem('userAccessToken'), { x, y, r, })
     }
 
     const response = await request().catch(() => { setErr('Ошибка отправки данных') })
 
-    if (response.status === 201) {
+    const { status, error } = response
+
+    if (status === ENTITY_CREATED_CODE) {
         submitInfoClear()
-        
+
         const dataJson = response.json()
         saveAndPrint(dataJson)
 
-    } else if (response.status === 400) {
+    } else if (status === BAD_REQUEST_CODE) {
         const data = response.json()
 
         data.then((error) => { setErr(error.error) })
-    } else if (response.status === 401) {
+    } else if (status === UNAUTHORIZED_CODE) {
         let isRefresh = false
         await useRefreshAccessToken().then((status) => { isRefresh = status })
 
         if (isRefresh) {
             const response = await request().catch(() => { setErr('Ошибка отправки данных') })
 
-            if (response.status === 201) {
+            if (status === ENTITY_CREATED_CODE) {
                 submitInfoClear()
 
                 const dataJson = response.json()
                 saveAndPrint(dataJson)
 
-            } else if (response.status === 401) {
+            } else if (status === UNAUTHORIZED_CODE) {
                 useForcedLogout(store, router)
             }
             else {
@@ -237,16 +239,17 @@ async function request(x, y, r) {
 
     function saveAndPrint(dataJson) {
         dataJson.then((data) => {
-            const date = new Date(Date.parse(data.date))
+            const { x, y, r, hit, execTime, date } = data
+            const parseDate = new Date(Date.parse(date))
             tableData.data.push({
-                x: data.x,
-                y: data.y,
-                r: data.r,
-                hit: data.hit ? 'Попал' : 'Не попал',
-                date: date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
-                execTime: data.execTime + 'мс'
+                x,
+                y,
+                r,
+                hit: hit ? 'Попал' : 'Не попал',
+                date: parseDate.toLocaleDateString() + ' ' + parseDate.toLocaleTimeString(),
+                execTime: execTime + 'мс'
             })
-            usePrintPointFromTable(document.getElementById('canvas'), data.x, data.y, data.r, data.hit ? 'red' : 'green', store)
+            usePrintPointFromTable(document.getElementById('canvas'), x, y, r, hit ? 'red' : 'green', store)
         })
     }
 
