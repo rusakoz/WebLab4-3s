@@ -9,79 +9,84 @@ const errObj = {
     loadErr: true
 }
 
-function request(){
-    return useFetchGet('/result/get', 
-                    {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('userAccessToken')
-                    })
+function request() {
+    return useFetchGet('/result/get',
+        {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('userAccessToken')
+        })
 }
 
-async function fillData(responseJson, tableData){
+async function fillData(array, tableData) {
     let result = []
 
-    await responseJson.then((a)=>{
-        for (const [key, value] of Object.entries(a)) {
-            const date = new Date(Date.parse(value.date))
-            tableData.push({
-                            x: value.x,
-                            y: value.y,
-                            r: value.r,
-                            hit: value.hit ? 'Попал' : 'Не попал',
-                            date: date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
-                            execTime: value.execTime + 'мс'
-                        })
-        }
-        if(tableData.length >= 1) tableData.shift()
-        result = tableData
-    })
+    for (const [key, value] of Object.entries(array)) {
+        const date = new Date(Date.parse(value.date))
+        tableData.push({
+            x: value.x,
+            y: value.y,
+            r: value.r,
+            hit: value.hit ? 'Попал' : 'Не попал',
+            date: date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
+            execTime: value.execTime + 'мс'
+        })
+    }
+    if (tableData.length >= 1) tableData.shift()
+    result = tableData
+
 
     return result
 }
 
-export async function useLoadTable(init = {}){
+export async function useLoadTable(init = {}) {
+    const UNAUTHORIZED_CODE = 401
+    const OK_CODE = 200
+
     const router = useRouter()
     const store = useStore()
 
     const tableData = init
 
-    const response = await request().catch(()=>{tableData.error = errObj})
+    const response = await request().catch(() => { tableData.error = errObj })
+    const { status, error } = response
 
-    if(response.status === 401){
+    if (status === OK_CODE) {
+        const data = await response.json()
+        fillData(data, tableData.data)
+    }
+    else if (status === UNAUTHORIZED_CODE) {
 
-        let isRefresh = false
-        await useRefreshAccessToken().then((status)=>{isRefresh = status})
+        let successRefreshToken = false
+        await useRefreshAccessToken().then((status) => { successRefreshToken = status }).catch(() => { tableData.error = errObj })
 
-        if(isRefresh){
-            const response = await request().catch(()=>{tableData.error = errObj})
-            if(response.status === 200){
-                const responseJson = response.json()
-
-                let errText
-                await responseJson.then((data)=>{errText = data.error})
-
-                if(typeof errText === 'undefined'){
-                    fillData(responseJson, tableData.data).then((data)=>{tableData.data = data})
-                }else{
-                    useForcedLogout(store, router)
-                }
-
-            }else if(response.status === 401){
-                useForcedLogout(store, router)
-            }
-            else{
-                tableData.error = errObj
-            }
-        }else{
+        if (!successRefreshToken) {
             useForcedLogout(store, router)
         }
+
+        const response = await request().catch(() => { tableData.error = errObj })
+        const { status, error } = response
+
+        if (status === OK_CODE) {
+            const responseJson = await response.json()
+            const hasError = Boolean(responseJson.error)
+
+            if (hasError) {
+                useForcedLogout(store, router)
+            }
+
+            fillData(responseJson, tableData.data)
+
+        }
+        else if (status === UNAUTHORIZED_CODE) {
+            useForcedLogout(store, router)
+        }
+        else {
+            tableData.error = errObj
+        }
+
     }
-    else if(response.status === 200){
-        const data = response.json()
-        fillData(data, tableData.data).then((data)=>{tableData.data = data})
-    }
-    else{
+    else {
         tableData.error = errObj
     }
 

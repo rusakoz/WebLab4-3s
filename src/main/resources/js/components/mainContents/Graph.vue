@@ -192,49 +192,51 @@ async function request(x, y, r) {
 
     submitInfo.status = 'sending'
     submitInfo.text = 'Отправка данных...'
+
     function request() {
         return useFetchPostJwt('/result/save', localStorage.getItem('userAccessToken'), { x, y, r, })
     }
 
     const response = await request().catch(() => { setErr('Ошибка отправки данных') })
-
     const { status, error } = response
 
     if (status === ENTITY_CREATED_CODE) {
-        submitInfoClear()
-
-        const dataJson = response.json()
-        saveAndPrint(dataJson)
-
-    } else if (status === BAD_REQUEST_CODE) {
+        afterCreatedStatus(response)
+    } 
+    else if (status === BAD_REQUEST_CODE) {
         const data = response.json()
-
         data.then((error) => { setErr(error.error) })
-    } else if (status === UNAUTHORIZED_CODE) {
-        let isRefresh = false
+    } 
+    else if (status === UNAUTHORIZED_CODE) {
+        let successRefreshToken = false
         await useRefreshAccessToken().then((status) => { isRefresh = status })
 
-        if (isRefresh) {
-            const response = await request().catch(() => { setErr('Ошибка отправки данных') })
-
-            if (status === ENTITY_CREATED_CODE) {
-                submitInfoClear()
-
-                const dataJson = response.json()
-                saveAndPrint(dataJson)
-
-            } else if (status === UNAUTHORIZED_CODE) {
-                useForcedLogout(store, router)
-            }
-            else {
-                setErr('Ошибка отправки данных')
-            }
-        } else {
+        if (!successRefreshToken) {
             useForcedLogout(store, router)
         }
+
+        const response = await request().catch(() => { setErr('Ошибка отправки данных') })
+        const { status, error } = response
+
+        if (status === ENTITY_CREATED_CODE) {
+            afterCreatedStatus(response)
+        }
+        else if (status === UNAUTHORIZED_CODE) {
+            useForcedLogout(store, router)
+        }
+        else {
+            setErr('Ошибка отправки данных')
+        }
+
     }
     else {
         setErr('Ошибка отправки данных')
+    }
+
+    function afterCreatedStatus(response) {
+        submitInfoClear()
+        const dataJson = response.json()
+        saveAndPrint(dataJson)
     }
 
     function saveAndPrint(dataJson) {
