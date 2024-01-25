@@ -1,0 +1,142 @@
+html {
+    box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+li {
+    list-style: none;
+}
+
+img {
+    max-width: 100%;
+}
+
+body {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #5c5c5e;
+    margin: 0;
+}
+
+.main-container {
+    min-height: calc(100vh - 81px);
+    background-image: url(../images/img.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: bottom center;
+}
+
+.container {
+    max-width: 1100px;
+    padding: 0 10px;
+    margin: 0 auto;
+}
+
+/* Header component */
+.header {
+    border-bottom: 1px solid #cacad6;
+}
+
+.nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    min-height: 80px;
+}
+
+.home {
+    cursor: pointer;
+    position: relative;
+    justify-self: end;
+    padding-right: 10px;
+    background-size: 16px 16px;
+    border: none;
+}
+
+.logo {
+    cursor: pointer;
+    justify-self: center;
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    color: #5c5c5e;
+    font-size: 16px;
+}
+/* Header component */
+
+
+/* Footer component */
+.footer {
+    position: relative;
+    margin-top: -60px;
+    /* отрицательное значение высоты футера */
+    height: 60px;
+    clear: both;
+    padding: 0;
+}
+
+.footer-text {
+    margin: 0;
+    font-size: 13px;
+}
+
+.container-footer {
+    display: flex;
+    align-items: center;
+    height: 60px;
+    padding-top: 10px;
+}
+
+.social {
+    display: flex;
+    margin-top: 0;
+    margin-bottom: 0;
+    gap: 15px;
+    padding-left: 20px;
+}
+
+.social-item {
+    height: 26px;
+    width: 26px;
+}
+
+.footer-img {
+    height: 26px;
+    width: 26px;
+}
+/* Footer component */
+
+
+/* Errors/Warnings */
+.form-control.invalid input {
+    border: 2px solid;
+    border-color: rgb(216, 97, 0);
+}
+
+.errors {
+    color: rgb(28, 28, 28);
+    font-size: 11px;
+    margin-left: 3px;
+}
+/* Errors/Warnings */
+
+
+@media (max-width: 424px) {
+    .nav {
+        height: 100px;
+    }
+
+    .footer {
+        margin-top: -100px;
+    }
+}

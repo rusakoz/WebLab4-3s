@@ -35,3 +35,12 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Node JS ###
+/node_modules
+
+### Prod vers forntend ###
+/src/main/resources/static/js/**
+
+### log ###
+.log
