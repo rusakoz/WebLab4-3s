@@ -1,0 +1,23 @@
+server:
+  port: 8887
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS
+  datasource:
+    dbcp2:
+      default-schema: ${schema}
+    url: ${db_url}
+    username: ${db_login}
+    password: ${db_password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties.hibernate:
+      default_schema: ${schema}
+      show-sql: true
+      format-sql: true
+
+logging:
+  level:
+    root: INFO
+

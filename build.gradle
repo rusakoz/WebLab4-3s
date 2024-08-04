@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.0'
 	id 'io.spring.dependency-management' version '1.1.4'
+	id "com.github.node-gradle.node" version "7.0.1"
 }
 
 group = 'org.lab4.wed'
@@ -17,16 +18,33 @@ configurations {
 	}
 }
 
+task buildFront(type: YarnTask) {
+  args = ['build']
+}
+
+yarn_install.dependsOn(yarn_cache_clean) // очистка кэша перед yarn install
+buildFront.dependsOn(yarn_install)
+processResources.dependsOn(buildFront) // запуск buildFront на этапе жизненного цикла gradle processResources
+
 repositories {
 	mavenCentral()
+}
+
+node {
+	download=true
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
 	compileOnly 'org.projectlombok:lombok'
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
