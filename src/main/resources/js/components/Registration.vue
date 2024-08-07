@@ -19,7 +19,7 @@
                     </div>
                     <div class="form-control" :class="{invalid: !form.equalPass && form.passwordTwo.touched}">
                       <label>Повторите пароль</label>
-                      <input class="password" type="password" placeholder="Повторите пароль" v-model="form.passwordTwo.value" @blur="form.passwordTwo.blur">
+                      <input class="password" type="password" id="secondPassword" placeholder="Повторите пароль" v-model="form.passwordTwo.value" @blur="form.passwordTwo.blur">
                       <small v-if="form.passwordTwo.errors.required && form.passwordTwo.touched" class="errors">Введите пароль</small>
                       <small v-else-if="form.passwordTwo.errors.minLength && form.passwordTwo.touched" class="errors">
                         Символов введено {{ form.passwordTwo.value.length }} из {{ minPassLength }}.
@@ -30,7 +30,7 @@
                     </div>
                     <button @click="submit" class="btn-auth" :disabled="!form.valid">Регистрация</button>
                     <h6 class="text-reg">Зарегистрированы?
-                      <router-link to="/login" class="link-reg">Войти</router-link>
+                      <router-link to="/login" id="to-log" class="link-reg">Войти</router-link>
                     </h6>
               </div>
           </div>
@@ -89,7 +89,6 @@ async function submit(){
         regErrText.value = errorText
         regErr.value = true
       }else{
-        reg.value = !reg.value
         router.push('/login')
       }
     }else{

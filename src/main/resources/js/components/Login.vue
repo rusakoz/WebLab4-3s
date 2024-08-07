@@ -21,7 +21,7 @@
           </div>
           <button @click="submit" class="btn-auth" :disabled="!form.valid">Войти</button>
           <h6 class="text-reg">Нет аккаунта?
-            <router-link to="/registration" class="link-reg">Регистрация</router-link>
+            <router-link to="/registration" id="to-reg" class="link-reg">Регистрация</router-link>
           </h6>
         </div>
       </div>
