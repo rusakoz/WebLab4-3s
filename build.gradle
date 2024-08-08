@@ -1,3 +1,5 @@
+import javax.xml.parsers.DocumentBuilderFactory
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.0'
@@ -18,18 +20,23 @@ configurations {
 	}
 }
 
+// yarn build
 task buildFront(type: YarnTask) {
   args = ['build']
 }
 
+// выполняем очистку кешей и скомпилированных файлов перед компиляцией
+// compileJava.dependsOn(clean)
+
 yarn_install.dependsOn(yarn_cache_clean) // очистка кэша перед yarn install
-buildFront.dependsOn(yarn_install)
-processResources.dependsOn(buildFront) // запуск buildFront на этапе жизненного цикла gradle processResources
+buildFront.dependsOn(yarn_install) // запуск yarn_install перед buildFront
+processResources.dependsOn(buildFront) // запуск buildFront на этапе жизненного цикла gradle processResources(самом начальном, чтобы он смог попасть в конечный jar)
 
 repositories {
 	mavenCentral()
 }
 
+// доустановка node.js в сборку
 node {
 	download=true
 }
@@ -47,12 +54,50 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
-	// testImplementation 'org.seleniumhq.selenium:selenium-java:4.23.0'
-    // testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.seleniumhq.selenium:selenium-java:4.23.0'
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
+}
+
+//compile
+task compileProject(type: JavaCompile) {
+    dependsOn 'classes'
+}
+
+//build
+task buildProject(type: Jar) {
+    dependsOn 'compileProject'
+    archiveFileName = 'WebLab4Application.jar'
+    from sourceSets.main.output
+    manifest {
+        attributes(
+                'Main-Class': 'org.lab4.web.webLab4.WebLab4Application'
+        )
+    }
+}
+
+//clean
+task cleanProject(type: Delete) {
+    delete 'build'
+}
+
+//xml - валидация всех xml-файлов в проекте
+task xmlProject() {
+    doLast {
+        def xmlFiles = fileTree(dir: '/', include: '**/*.xml')
+		println 'xmlFiles'
+        xmlFiles.each { file ->
+            try {
+                def factory = DocumentBuilderFactory.newInstance()
+                def builder = factory.newDocumentBuilder()
+                builder.parse(file)
+                println "XML-file '${file}' valied"
+            } catch (Exception e) {
+                println "XML-file '${file}' unvalied: ${e.message}"
+            }
+        }
+    }
 }
