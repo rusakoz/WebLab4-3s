@@ -1,4 +1,5 @@
 import javax.xml.parsers.DocumentBuilderFactory
+import java.io.ByteArrayOutputStream
 
 plugins {
 	id 'java'
@@ -24,9 +25,6 @@ configurations {
 task buildFront(type: YarnTask) {
   args = ['build']
 }
-
-// выполняем очистку кешей и скомпилированных файлов перед компиляцией
-// compileJava.dependsOn(clean)
 
 yarn_install.dependsOn(yarn_cache_clean) // очистка кэша перед yarn install
 buildFront.dependsOn(yarn_install) // запуск yarn_install перед buildFront
@@ -63,21 +61,82 @@ test {
 }
 
 //compile
-task compileProject(type: JavaCompile) {
+tasks.register('compileProject') {
+    description = 'compile project'
     dependsOn 'classes'
+    doLast{
+        println 'Compile project...'
+    }
 }
 
 //build
 task buildProject(type: Jar) {
+    description 'build project'
     dependsOn 'compileProject'
+    dependsOn 'bootJar'
     archiveFileName = 'WebLab4Application.jar'
     from sourceSets.main.output
     manifest {
         attributes(
-                'Main-Class': 'org.lab4.web.webLab4.WebLab4Application'
+                'Main-Class': 'org.lab4.wed.weblab4.WebLab4Application',
         )
     }
+    doFirst {
+        println("Jars Java...")
+    }
 }
+
+task tet() {
+    println 'yep yep'
+}
+
+project.gradle.buildFinished {
+    if (compileJava.state.failure != null) {
+        println compileJava.state.failure
+        println "Crash compile"
+        def col = ['1', '2', '3']
+        col.each { count ->
+            println count
+            project.exec( {
+                commandLine 'powershell', '-c', "./gradlew 'tet'"
+                commandLine 'powershell', '-c', "./gradlew '--stop'"
+            })
+        }
+    }
+}
+
+
+task mems() {
+    doLast{
+        def col = ['1', '2', '3']
+        col.each {count ->
+            exec{
+                workingDir '.'
+                // commandLine 'gradlew.bat'
+                // sleep(10 * 1000)
+                // commandLine 'powershell', '-c', "./gradlew '--stop'"
+                commandLine 'gradlew.bat', 'tet'
+            }
+            // commandLine 'powershell', '-c', "./gradlew '--stop'"
+            // sleep(10 * 1000)
+        }
+    }
+}
+
+
+
+// Remove 'doLast' for die your PC, infinity starting processes Java SE, omg...
+// task mems() {
+//     doLast{
+//         def col = ['1', '2', '3']
+//         col.each {count ->
+//             exec{
+//                 commandLine 'powershell', '-c', "./gradlew 'tet'"
+//             }
+//         }
+//     }
+// }
+
 
 //clean
 task cleanProject(type: Delete) {
@@ -101,3 +160,5 @@ task xmlProject() {
         }
     }
 }
+
+// history
