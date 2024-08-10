@@ -1,5 +1,6 @@
 import javax.xml.parsers.DocumentBuilderFactory
 import java.io.ByteArrayOutputStream
+import groovy.io.FileType
 
 plugins {
 	id 'java'
@@ -60,6 +61,11 @@ test {
 	useJUnitPlatform()
 }
 
+
+// compileJava{
+//     options.failOnError = false
+// }
+
 //compile
 tasks.register('compileProject') {
     description = 'compile project'
@@ -69,10 +75,82 @@ tasks.register('compileProject') {
     }
 }
 
+task rar(){
+    doFirst{
+        println '321321'
+    }
+    
+}
+
+task rrr(){
+    doLast{
+        println rar.state.executed
+    }
+    
+}
+
+//historyForCompile
+tasks.register('hc') {
+    mustRunAfter compileProject
+    doLast{
+        if (compileJava.state.failure != null) {
+            println 'omg'
+            def col = ['1', '2', '3', '4']
+            col.any { count ->
+                println count + 'lox'
+                def result = exec{
+                    ignoreExitValue true
+                    commandLine 'gradlew.bat', '--continue', 'compileProject'
+                }
+                if(result.exitValue == 0){
+                    println ' > [TASK HISTORY]: RECompile Project: Success! yep yep'
+                    true
+                }else{
+                    println ' > [TASK HISTORY]: RECompile Project: lose! :('
+                }
+            }
+        }
+    }
+}
+
+//historyForBuild
+tasks.register('hb') {
+    mustRunAfter compileProject
+    doLast{
+        if (compileJava.state.failure != null) {
+            println 'omg'
+            def col = ['1', '2', '3', '4']
+            col.any { count ->
+                println count + 'lox'
+                def result = exec{
+                    ignoreExitValue true
+                    commandLine 'gradlew.bat', '--continue', 'compileProject'
+                }
+                if(result.exitValue == 0){
+                    println ' > [TASK HISTORY]: RECompile Project: Success! yep yep'
+                    // добавить коммандЛайн на повторный билд
+                    true
+                }else{
+                    println ' > [TASK HISTORY]: RECompile Project: lose! :('
+                }
+            }
+        }
+        println 'History build'
+    }
+}
+
+bootJar {
+    mustRunAfter hb
+    doLast{
+        println 'bootJar'
+    }
+}
+
 //build
 task buildProject(type: Jar) {
     description 'build project'
     dependsOn 'compileProject'
+    dependsOn 'hb'
     dependsOn 'bootJar'
     archiveFileName = 'WebLab4Application.jar'
     from sourceSets.main.output
@@ -81,29 +159,47 @@ task buildProject(type: Jar) {
                 'Main-Class': 'org.lab4.wed.weblab4.WebLab4Application',
         )
     }
-    doFirst {
-        println("Jars Java...")
+    doLast{
+        println 'opopopopop'
     }
+    
 }
 
-task tet() {
-    println 'yep yep'
-}
+// project.gradle.buildFinished {
+//     if (compileJava.state.failure != null) {
+//         println 'omg'
+//         def col = ['1', '2', '3', '4']
+//         col.any { count ->
+//             println count + 'lox'
+//             def result = exec{
+//                 ignoreExitValue true
+//                 commandLine 'gradlew.bat', 'compileProject'
+//             }
+//             if(result.exitValue == 0){
+//                 println ' > [TASK HISTORY]: RECompile Project: Success! yep yep'
+//                 true
+//             }else{
+//                 println ' > [TASK HISTORY]: RECompile Project: lose! :('
+//             }
+//         }
+//     }
+// }
 
-project.gradle.buildFinished {
-    if (compileJava.state.failure != null) {
-        println compileJava.state.failure
-        println "Crash compile"
-        def col = ['1', '2', '3']
-        col.each { count ->
-            println count
-            project.exec( {
-                commandLine 'powershell', '-c', "./gradlew 'tet'"
-                commandLine 'powershell', '-c', "./gradlew '--stop'"
-            })
-        }
-    }
-}
+// project.gradle.buildFinished {
+//     if (compileJava.state.failure != null) {
+//         println compileProject.state.failure
+//         println compileJava.state.failure
+//         println "Crash compile"
+//         def col = ['1', '2']
+//         col.each { count ->
+//             println count
+//             exec{
+//                 commandLine 'gradlew.bat', 'compileProject'
+//             }
+//         }
+//     }
+// }
+
 
 
 task mems() {
@@ -125,7 +221,7 @@ task mems() {
 
 
 
-// Remove 'doLast' for die your PC, infinity starting processes Java SE, omg...
+// Remove 'doLast' for die your PC, infinity starts processes Java SE, omg...
 // task mems() {
 //     doLast{
 //         def col = ['1', '2', '3']
