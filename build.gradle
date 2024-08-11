@@ -61,17 +61,12 @@ test {
 	useJUnitPlatform()
 }
 
-
-// compileJava{
-//     options.failOnError = false
-// }
-
 //compile
 tasks.register('compileProject') {
     description = 'compile project'
     dependsOn 'classes'
     doLast{
-        println 'Compile project...'
+        println ' > [TASK COMPILE PROJECT]: Success'
     }
 }
 
@@ -130,46 +125,6 @@ tasks.register('historyCompile') {
 }
 
 
-task xxx(){
-    doLast{
-        def stash = 'git stash'.execute()
-        stash.waitFor()
-
-        def currentCommit = 'git rev-parse HEAD'.execute()
-        currentCommit.waitFor()
-        def currentBranch = 'git rev-parse --abbrev-ref HEAD'.execute()
-        currentBranch.waitFor()
-        def commitList = 'git rev-list HEAD'.execute()
-        commitList.waitFor()
-
-        def stashPop = 'git stash pop'.execute()
-        stashPop.waitFor()
-
-        if(stash.exitValue() == 0 && currentCommit.exitValue() == 0 && currentBranch.exitValue() == 0 && commitList.exitValue() == 0){
-            currentCommit = currentCommit.text
-            currentBranch = currentBranch.text
-            commitList = commitList.text.split("\n")
-            println stash
-            println currentCommit
-            println currentBranch
-            println commitList
-            println stashPop
-            println commitList[0].toString()
-            println commitList[1].toString()
-            def gitCheckoutBranch = 'git checkout ' + commitList[15].toString()
-            gitCheckoutBranch.execute().waitFor()
-            def result = exec{
-                    ignoreExitValue true
-                    commandLine 'gradlew.bat', 'ttt'
-                }
-        }
-        // exec{
-        //     ignoreExitValue = true
-        //     commandLine 'git'
-        // }
-    }
-}
-
 //build
 task buildProject(type: Jar) {
     description 'build project'
@@ -210,7 +165,6 @@ tasks.register('historyBuild') {
                 currentBranch = currentBranch.text
                 commitList = commitList.text.split("\n")
                 commitList.any { rev ->
-                    println rev + 'lox'
 
                     def gitCheckoutBranch = 'git checkout ' + rev
                     gitCheckoutBranch.execute().waitFor()
@@ -249,50 +203,38 @@ tasks.register('historyBuild') {
     }
 }
 
+//clean
+task cleanProject(type: Delete) {
+    delete 'build'
+    doLast{
+        println ' > [TASK CLEAN PROJECT]: Success'
+    }
+}
+
+//xml - валидация всех xml-файлов в проекте
+task xmlProject() {
+    doLast {
+        def xmlFiles = fileTree(dir: '/', include: '**/*.xml')
+        xmlFiles.each { file ->
+            try {
+                def factory = DocumentBuilderFactory.newInstance()
+                def builder = factory.newDocumentBuilder()
+                builder.parse(file)
+                println "XML-file '${file}' valied"
+            } catch (Exception e) {
+                println "XML-file '${file}' unvalied: ${e.message}"
+            }
+        }
+        println ' > [TASK XML PROJECT]: Success'
+    }
+}
+
 bootJar {
     mustRunAfter historyBuild
     doLast{
         println ' > [TASK BOOTJAR]: Success'
     }
 }
-
-// project.gradle.buildFinished {
-//     if (compileJava.state.failure != null) {
-//         println 'omg'
-//         def col = ['1', '2', '3', '4']
-//         col.any { count ->
-//             println count + 'lox'
-//             def result = exec{
-//                 ignoreExitValue true
-//                 commandLine 'gradlew.bat', 'compileProject'
-//             }
-//             if(result.exitValue == 0){
-//                 println ' > [TASK HISTORY]: RECompile Project: Success! yep yep'
-//                 true
-//             }else{
-//                 println ' > [TASK HISTORY]: RECompile Project: lose! :('
-//             }
-//         }
-//     }
-// }
-
-// project.gradle.buildFinished {
-//     if (compileJava.state.failure != null) {
-//         println compileProject.state.failure
-//         println compileJava.state.failure
-//         println "Crash compile"
-//         def col = ['1', '2']
-//         col.each { count ->
-//             println count
-//             exec{
-//                 commandLine 'gradlew.bat', 'compileProject'
-//             }
-//         }
-//     }
-// }
-
-
-
 
 // Remove 'doLast' for die your PC, infinity starts processes Java SE, omg...
 // task mems() {
@@ -305,29 +247,3 @@ bootJar {
 //         }
 //     }
 // }
-
-
-//clean
-task cleanProject(type: Delete) {
-    delete 'build'
-}
-
-//xml - валидация всех xml-файлов в проекте
-task xmlProject() {
-    doLast {
-        def xmlFiles = fileTree(dir: '/', include: '**/*.xml')
-		println 'xmlFiles'
-        xmlFiles.each { file ->
-            try {
-                def factory = DocumentBuilderFactory.newInstance()
-                def builder = factory.newDocumentBuilder()
-                builder.parse(file)
-                println "XML-file '${file}' valied"
-            } catch (Exception e) {
-                println "XML-file '${file}' unvalied: ${e.message}"
-            }
-        }
-    }
-}
-
-// history
