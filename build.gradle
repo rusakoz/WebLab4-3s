@@ -170,18 +170,11 @@ task xxx(){
     }
 }
 
-bootJar {
-    mustRunAfter hb
-    doLast{
-        println ' > [TASK BOOTJAR]: Success'
-    }
-}
-
 //build
 task buildProject(type: Jar) {
     description 'build project'
     dependsOn 'compileProject'
-    dependsOn 'hb'
+    dependsOn 'historyBuild'
     dependsOn 'bootJar'
     archiveFileName = 'WebLab4Application.jar'
     from sourceSets.main.output
@@ -198,7 +191,7 @@ task buildProject(type: Jar) {
 
 // ./gradlew --continue buildProject
 //historyForBuild
-tasks.register('hb') {
+tasks.register('historyBuild') {
     mustRunAfter compileProject
     doLast{
         if (compileJava.state.failure != null) {
@@ -254,6 +247,13 @@ tasks.register('hb') {
             }
         }
         println ' > [TASK HISTORY BUILD]: Success'
+    }
+}
+
+bootJar {
+    mustRunAfter historyBuild
+    doLast{
+        println ' > [TASK BOOTJAR]: Success'
     }
 }
 
