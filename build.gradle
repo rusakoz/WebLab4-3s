@@ -205,7 +205,6 @@ tasks.register('historyBuild') {
             def commitList = 'git rev-list HEAD'.execute()
             commitList.waitFor()
 
-            println 'omg'
             if(stash.exitValue() == 0 && currentCommit.exitValue() == 0 && currentBranch.exitValue() == 0 && commitList.exitValue() == 0){
                 currentCommit = currentCommit.text
                 currentBranch = currentBranch.text
