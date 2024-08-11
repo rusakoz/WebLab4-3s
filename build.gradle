@@ -75,9 +75,9 @@ tasks.register('compileProject') {
     }
 }
 
-
+// ./gradlew --continue compileProject historyCompile
 //historyForCompile
-tasks.register('hc') {
+tasks.register('historyCompile') {
     mustRunAfter compileProject
     doLast{
         if (compileJava.state.failure != null) {
@@ -91,13 +91,11 @@ tasks.register('hc') {
             def commitList = 'git rev-list HEAD'.execute()
             commitList.waitFor()
 
-            println 'omg'
             if(stash.exitValue() == 0 && currentCommit.exitValue() == 0 && currentBranch.exitValue() == 0 && commitList.exitValue() == 0){
                 currentCommit = currentCommit.text
                 currentBranch = currentBranch.text
                 commitList = commitList.text.split("\n")
                 commitList.any { rev ->
-                    println rev + 'lox'
 
                     def gitCheckoutBranch = 'git checkout ' + rev
                     gitCheckoutBranch.execute().waitFor()
@@ -127,15 +125,10 @@ tasks.register('hc') {
                 def stashPop = 'git stash pop'.execute().waitFor()
             }
         }
-        println 'History compile'
+        println ' > [TASK HISTORY COMPILE]: Success'
     }
 }
 
-task ttt(){
-    doLast{
-        println 'gfjhjhjhjhfg'
-    }
-}
 
 task xxx(){
     doLast{
@@ -177,39 +170,10 @@ task xxx(){
     }
 }
 
-//historyForBuild
-tasks.register('hb') {
-    mustRunAfter compileProject
-    doLast{
-        if (compileJava.state.failure != null) {
-            println 'omg'
-            def col = ['1', '2', '3', '4']
-            col.any { count ->
-                println count + 'lox'
-                def result = exec{
-                    ignoreExitValue true
-                    commandLine 'gradlew.bat', 'compileProject'
-                }
-                if(result.exitValue == 0){
-                    println ' > [TASK HISTORY]: RECompile Project: Success! yep yep'
-                    exec{
-                        ignoreExitValue true
-                        commandLine 'gradlew.bat', 'buildProject'
-                    }
-                    true
-                }else{
-                    println ' > [TASK HISTORY]: RECompile Project: lose! :('
-                }
-            }
-        }
-        println 'History build'
-    }
-}
-
 bootJar {
     mustRunAfter hb
     doLast{
-        println 'bootJar'
+        println ' > [TASK BOOTJAR]: Success'
     }
 }
 
@@ -227,9 +191,70 @@ task buildProject(type: Jar) {
         )
     }
     doLast{
-        println 'opopopopop'
+        println ' > [TASK BUILD PROJECT]: Success'
     }
     
+}
+
+// ./gradlew --continue buildProject
+//historyForBuild
+tasks.register('hb') {
+    mustRunAfter compileProject
+    doLast{
+        if (compileJava.state.failure != null) {
+            def stash = 'git stash'.execute()
+            stash.waitFor()
+
+            def currentCommit = 'git rev-parse HEAD'.execute()
+            currentCommit.waitFor()
+            def currentBranch = 'git rev-parse --abbrev-ref HEAD'.execute()
+            currentBranch.waitFor()
+            def commitList = 'git rev-list HEAD'.execute()
+            commitList.waitFor()
+
+            println 'omg'
+            if(stash.exitValue() == 0 && currentCommit.exitValue() == 0 && currentBranch.exitValue() == 0 && commitList.exitValue() == 0){
+                currentCommit = currentCommit.text
+                currentBranch = currentBranch.text
+                commitList = commitList.text.split("\n")
+                commitList.any { rev ->
+                    println rev + 'lox'
+
+                    def gitCheckoutBranch = 'git checkout ' + rev
+                    gitCheckoutBranch.execute().waitFor()
+
+                    def result = exec{
+                        ignoreExitValue true
+                        commandLine 'gradlew.bat', 'compileProject'
+                    }
+
+                    if(result.exitValue == 0){
+                        exec{
+                            ignoreExitValue true
+                            commandLine 'gradlew.bat', 'buildProject'
+                        }
+
+                        def strGitDiffCommand = 'powershell git diff ' + rev + ' ' + currentCommit + ' > build/diff.txt'
+                        strGitDiffCommand.execute().waitFor()
+
+                        println ' > [TASK HISTORY BUILD]: RECompile Project: Success! yep yep'
+                        println ' > [TASK HISTORY BUILD]: Work commit: ' + rev
+                        true
+                    }else{
+                        println ' > [TASK HISTORY BUILD]: RECompile Project: lose! :('
+                    }
+                }
+            }else{
+                println ' > [TASK HISTORY BUILD]: FAILURE'
+            }
+            def gitCheckoutBranch = 'git checkout ' + currentBranch
+            gitCheckoutBranch.execute().waitFor()
+            if(stash.exitValue() == 0){
+                def stashPop = 'git stash pop'.execute().waitFor()
+            }
+        }
+        println ' > [TASK HISTORY BUILD]: Success'
+    }
 }
 
 // project.gradle.buildFinished {
@@ -267,24 +292,6 @@ task buildProject(type: Jar) {
 //     }
 // }
 
-
-
-task mems() {
-    doLast{
-        def col = ['1', '2', '3']
-        col.each {count ->
-            exec{
-                workingDir '.'
-                // commandLine 'gradlew.bat'
-                // sleep(10 * 1000)
-                // commandLine 'powershell', '-c', "./gradlew '--stop'"
-                commandLine 'gradlew.bat', 'tet'
-            }
-            // commandLine 'powershell', '-c', "./gradlew '--stop'"
-            // sleep(10 * 1000)
-        }
-    }
-}
 
 
 
