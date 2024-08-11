@@ -106,6 +106,7 @@ tasks.register('hc') {
                         ignoreExitValue true
                         commandLine 'gradlew.bat', 'compileProject'
                     }
+
                     if(result.exitValue == 0){
                         def strGitDiffCommand = 'powershell git diff ' + commitList[0].toString() + ' ' + commitList[2].toString() + ' > build/diff.txt'
                         def gitDiff = strGitDiffCommand.execute().waitFor()
@@ -126,6 +127,12 @@ tasks.register('hc') {
             }
         }
         println 'History compile'
+    }
+}
+
+task ttt(){
+    doLast{
+        println 'gfjhjhjhjhfg'
     }
 }
 
@@ -156,9 +163,11 @@ task xxx(){
             println commitList[0].toString()
             println commitList[1].toString()
             def gitCheckoutBranch = 'git checkout ' + commitList[15].toString()
-            def m = gitCheckoutBranch.execute()
-            def f = m.waitFor()
-            println f
+            gitCheckoutBranch.execute().waitFor()
+            def result = exec{
+                    ignoreExitValue true
+                    commandLine 'gradlew.bat', 'ttt'
+                }
         }
         // exec{
         //     ignoreExitValue = true
