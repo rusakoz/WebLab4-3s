@@ -155,7 +155,7 @@ task xxx(){
             println stashPop
             println commitList[0].toString()
             println commitList[1].toString()
-            def gitCheckoutBranch = 'powershell git checkout ' + commitList[15].toString()
+            def gitCheckoutBranch = 'git checkout ' + commitList[15].toString()
             def m = gitCheckoutBranch.execute()
             def f = m.waitFor()
             println f
