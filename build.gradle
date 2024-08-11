@@ -108,13 +108,14 @@ tasks.register('hc') {
                     }
 
                     if(result.exitValue == 0){
-                        def strGitDiffCommand = 'powershell git diff ' + commitList[0].toString() + ' ' + commitList[2].toString() + ' > build/diff.txt'
-                        def gitDiff = strGitDiffCommand.execute().waitFor()
+                        def strGitDiffCommand = 'powershell git diff ' + rev + ' ' + currentCommit + ' > build/diff.txt'
+                        strGitDiffCommand.execute().waitFor()
 
-                        println ' > [TASK HISTORY]: RECompile Project: Success! yep yep'
+                        println ' > [TASK HISTORY COMPILE]: RECompile Project: Success! yep yep'
+                        println ' > [TASK HISTORY COMPILE]: Work commit: ' + rev
                         true
                     }else{
-                        println ' > [TASK HISTORY]: RECompile Project: lose! :('
+                        println ' > [TASK HISTORY COMPILE]: RECompile Project: lose! :('
                     }
                 }
             }else{
