@@ -75,41 +75,95 @@ tasks.register('compileProject') {
     }
 }
 
-task rar(){
-    doFirst{
-        println '321321'
-    }
-    
-}
-
-task rrr(){
-    doLast{
-        println rar.state.executed
-    }
-    
-}
 
 //historyForCompile
 tasks.register('hc') {
     mustRunAfter compileProject
     doLast{
         if (compileJava.state.failure != null) {
+            def stash = 'git stash'.execute()
+            stash.waitFor()
+
+            def currentCommit = 'git rev-parse HEAD'.execute()
+            currentCommit.waitFor()
+            def currentBranch = 'git rev-parse --abbrev-ref HEAD'.execute()
+            currentBranch.waitFor()
+            def commitList = 'git rev-list HEAD'.execute()
+            commitList.waitFor()
+
             println 'omg'
-            def col = ['1', '2', '3', '4']
-            col.any { count ->
-                println count + 'lox'
-                def result = exec{
-                    ignoreExitValue true
-                    commandLine 'gradlew.bat', '--continue', 'compileProject'
+            if(stash.exitValue() == 0 && currentCommit.exitValue() == 0 && currentBranch.exitValue() == 0 && commitList.exitValue() == 0){
+                currentCommit = currentCommit.text
+                currentBranch = currentBranch.text
+                commitList = commitList.text.split("\n")
+                commitList.any { rev ->
+                    println rev + 'lox'
+
+                    def gitCheckoutBranch = 'git checkout ' + rev
+                    gitCheckoutBranch.execute().waitFor()
+
+                    def result = exec{
+                        ignoreExitValue true
+                        commandLine 'gradlew.bat', 'compileProject'
+                    }
+                    if(result.exitValue == 0){
+                        def strGitDiffCommand = 'powershell git diff ' + commitList[0].toString() + ' ' + commitList[2].toString() + ' > build/diff.txt'
+                        def gitDiff = strGitDiffCommand.execute().waitFor()
+
+                        println ' > [TASK HISTORY]: RECompile Project: Success! yep yep'
+                        true
+                    }else{
+                        println ' > [TASK HISTORY]: RECompile Project: lose! :('
+                    }
                 }
-                if(result.exitValue == 0){
-                    println ' > [TASK HISTORY]: RECompile Project: Success! yep yep'
-                    true
-                }else{
-                    println ' > [TASK HISTORY]: RECompile Project: lose! :('
-                }
+            }else{
+                println ' > [TASK HISTORY COMPILE]: FAILURE'
+            }
+            def gitCheckoutBranch = 'git checkout ' + currentBranch
+            gitCheckoutBranch.execute().waitFor()
+            if(stash.exitValue() == 0){
+                def stashPop = 'git stash pop'.execute().waitFor()
             }
         }
+        println 'History compile'
+    }
+}
+
+task xxx(){
+    doLast{
+        def stash = 'git stash'.execute()
+        stash.waitFor()
+
+        def currentCommit = 'git rev-parse HEAD'.execute()
+        currentCommit.waitFor()
+        def currentBranch = 'git rev-parse --abbrev-ref HEAD'.execute()
+        currentBranch.waitFor()
+        def commitList = 'git rev-list HEAD'.execute()
+        commitList.waitFor()
+
+        def stashPop = 'git stash pop'.execute()
+        stashPop.waitFor()
+
+        if(stash.exitValue() == 0 && currentCommit.exitValue() == 0 && currentBranch.exitValue() == 0 && commitList.exitValue() == 0){
+            currentCommit = currentCommit.text
+            currentBranch = currentBranch.text
+            commitList = commitList.text.split("\n")
+            println stash
+            println currentCommit
+            println currentBranch
+            println commitList
+            println stashPop
+            println commitList[0].toString()
+            println commitList[1].toString()
+            def gitCheckoutBranch = 'powershell git checkout ' + commitList[15].toString()
+            def m = gitCheckoutBranch.execute()
+            def f = m.waitFor()
+            println f
+        }
+        // exec{
+        //     ignoreExitValue = true
+        //     commandLine 'git'
+        // }
     }
 }
 
@@ -124,11 +178,14 @@ tasks.register('hb') {
                 println count + 'lox'
                 def result = exec{
                     ignoreExitValue true
-                    commandLine 'gradlew.bat', '--continue', 'compileProject'
+                    commandLine 'gradlew.bat', 'compileProject'
                 }
                 if(result.exitValue == 0){
                     println ' > [TASK HISTORY]: RECompile Project: Success! yep yep'
-                    // добавить коммандЛайн на повторный билд
+                    exec{
+                        ignoreExitValue true
+                        commandLine 'gradlew.bat', 'buildProject'
+                    }
                     true
                 }else{
                     println ' > [TASK HISTORY]: RECompile Project: lose! :('
