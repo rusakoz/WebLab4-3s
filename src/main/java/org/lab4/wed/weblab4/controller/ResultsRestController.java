@@ -9,6 +9,8 @@ import org.lab4.wed.weblab4.db.dto.ResultsReadDto;
 import org.lab4.wed.weblab4.db.service.AuthJwtService;
 import org.lab4.wed.weblab4.db.service.ResultService;
 import org.lab4.wed.weblab4.jwt.JwtAuthentication;
+import org.lab4.wed.weblab4.model.AverageClickInterval;
+import org.lab4.wed.weblab4.model.BrainLogic;
 import org.lab4.wed.weblab4.model.ValidatorCoords;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +30,8 @@ import lombok.RequiredArgsConstructor;
 public class ResultsRestController {
     private final AuthJwtService authJwtService;
     private final ResultService resultService;
+    private final BrainLogic brainLogic;
+    private final AverageClickInterval averageClickInterval;
 
     @SecurityRequirement(name = "Bearer Authorization")
     @GetMapping("get")
@@ -48,8 +52,10 @@ public class ResultsRestController {
     @PostMapping(value = "save", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> saveResult(@RequestBody ResultsCreateEditDto resultsDto) {
         final JwtAuthentication authInfo = authJwtService.getAuthInfo();
-
-        if (!ValidatorCoords.validate(resultsDto.getX(), resultsDto.getY(), resultsDto.getR())) {
+        double X = resultsDto.getX();
+        double Y = resultsDto.getY();
+        double R = resultsDto.getR();
+        if (!ValidatorCoords.validate(X, Y, R)) {
             Map<String, String> message = new HashMap<>();
             message.put("error", "Невалидные данные");
             return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
@@ -58,6 +64,11 @@ public class ResultsRestController {
         resultsDto.setUserId(authInfo.getUserId());
 
         final ResultsReadDto readDto = resultService.checkHitAndCreateNew(resultsDto);
+
+        final List<ResultsReadDto> listResReadDto = resultService.findByUserId(authInfo.getUserId());
+
+        System.out.println(brainLogic.mainLogic(listResReadDto, X, Y, R)); // OPI lab4
+        System.out.println(averageClickInterval.mainLogic(listResReadDto)); // OPI lab4
 
         return new ResponseEntity<>(readDto, HttpStatus.CREATED);
     }
