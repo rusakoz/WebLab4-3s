@@ -4,7 +4,8 @@ export function useFetchPostJwt(url = "", json = {}){
         headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem('userAccessToken')
+        'Authorization': 'Bearer ' + localStorage.getItem('userAccessToken'),
+        // 'Clear-Site-Data': '*'
         },
         body: JSON.stringify(json)
       })

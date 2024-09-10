@@ -1,5 +1,6 @@
 package org.lab4.wed.weblab4.db.service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,10 +10,12 @@ import org.lab4.wed.weblab4.jwt.JwtProvider;
 import org.lab4.wed.weblab4.jwt.JwtRequest;
 import org.lab4.wed.weblab4.jwt.JwtResponse;
 import org.lab4.wed.weblab4.security.BcryptEncoder;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.security.auth.message.AuthException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +99,31 @@ public class AuthJwtService {
     }
 
     public JwtAuthentication getAuthInfo() {
+        refreshStorage.forEach((a, s) -> {
+            System.out.println(a + " " + s);
+        });
         return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    public void removeMapValueByName(String name) {
+        refreshStorage.remove(name);
+    }
+
+    public Boolean isRefreshTokenExpired(String refreshToken) {
+        try{
+            final Claims claims = jwtProvider().getRefreshClaims(refreshToken);
+            return claims.getExpiration().before(new Date());
+        }catch(ExpiredJwtException e){
+            return true;
+        }
+    }
+
+    @Scheduled(initialDelay = 86400000, fixedRate = 86400000)
+    public void dailyGarbageCollectorMap() {
+        for(Map.Entry<String, String> map : refreshStorage.entrySet()){
+            if(isRefreshTokenExpired(map.getValue())){
+                refreshStorage.remove(map.getKey());
+            }
+        }
     }
 }

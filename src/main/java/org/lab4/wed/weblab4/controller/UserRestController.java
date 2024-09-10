@@ -12,6 +12,10 @@ import org.lab4.wed.weblab4.jwt.RefreshJwtRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -44,6 +48,7 @@ public class UserRestController {
         JwtResponse token;
         try {
             token = authJwtService.login(authRequest);
+            
         } catch (AuthException e) {
             Map<String, String> message = new HashMap<>();
             message.put("error", e.getMessage());

@@ -82,6 +82,7 @@ async function submit() {
         localStorage.setItem('userAccessToken', res.accessToken)
         localStorage.setItem('userRefreshToken', res.refreshToken)
         localStorage.setItem('isLoggin', true)
+        localStorage.setItem('name', form.name.value)
         store.commit('setAuthValue', true)
       })
       router.replace('/hello')
